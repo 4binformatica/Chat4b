@@ -39,5 +39,5 @@ jobs:
           app-name: 'Chat4bTest'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0033381EE664485286470121264842B5 }}
-          package: '${{ env.PACKAGE_DIRECTORY }}'
+          package: '${{ env.PACKAGE_DIRECTORY }}/server'
           respect-pom-xml: true
