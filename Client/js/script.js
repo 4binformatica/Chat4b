@@ -1,4 +1,4 @@
-let socket = new WebSocket("ws://localhost:8887/");
+let socket = new WebSocket("ws://chat4btest.azurewebsites.net:8887/");
 
 socket.addEventListener('open', (event) => {
     
