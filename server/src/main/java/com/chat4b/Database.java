@@ -1,3 +1,5 @@
+package com.chat4b;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;

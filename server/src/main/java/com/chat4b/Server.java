@@ -1,3 +1,5 @@
+package com.chat4b;
+
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;

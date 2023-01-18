@@ -1,3 +1,5 @@
+package com.chat4b;
+
 import org.java_websocket.WebSocket;
 
 /**

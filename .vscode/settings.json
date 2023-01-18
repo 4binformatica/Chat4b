@@ -16,5 +16,9 @@
         "g:\\Work\\Librerie\\slf4j-jdk-platform-logging-2.0.6.jar",
         "g:\\Work\\Librerie\\slf4j-log4j13-1.0.1.jar",
         "g:\\Work\\Librerie\\sqlite-jdbc-3.40.0.0.jar"
-    ]
+    ],
+    "java.project.sourcePaths": [
+        "server\\src\\main\\java\\com\\chat4b"
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

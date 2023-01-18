@@ -1,3 +1,5 @@
+package com.chat4b;
+
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
 
