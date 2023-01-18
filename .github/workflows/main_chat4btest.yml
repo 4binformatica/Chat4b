@@ -29,7 +29,7 @@ jobs:
       - name: 'Restore Project Dependencies Using Mvn'
         shell: pwsh
         run: |
-          pushd './${{ env.PACKAGE_DIRECTORY }}/server'
+          pushd './${{ env.PACKAGE_DIRECTORY }}/Server'
           mvn clean package
           popd
       - name: 'Run Azure Functions Action'
@@ -39,5 +39,5 @@ jobs:
           app-name: 'Chat4bTest'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0033381EE664485286470121264842B5 }}
-          package: '${{ env.PACKAGE_DIRECTORY }}/server'
+          package: '${{ env.PACKAGE_DIRECTORY }}/Server'
           respect-pom-xml: true
