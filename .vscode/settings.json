@@ -1,0 +1,20 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\studente\\Downloads\\Java-WebSocket-1.5.3-javadoc.jar",
+        "c:\\Users\\studente\\Downloads\\Java-WebSocket-1.5.3.jar",
+        "c:\\Users\\studente\\Downloads\\Java-WebSocket-1.5.3-sources.jar",
+        "c:\\Users\\studente\\Downloads\\slf4j.jar",
+        "c:\\Users\\studente\\Downloads\\logback.jar",
+        "c:\\Users\\studente\\Downloads\\sqlite-jdbc-3.40.0.0.jar",
+        "g:\\Work\\Librerie\\apache-logging-log4j.jar",
+        "g:\\Work\\Librerie\\Java-WebSocket-1.5.3.jar",
+        "g:\\Work\\Librerie\\Java-WebSocket-1.5.3-javadoc.jar",
+        "g:\\Work\\Librerie\\Java-WebSocket-1.5.3-sources.jar",
+        "g:\\Work\\Librerie\\logback.jar",
+        "g:\\Work\\Librerie\\slf4j.jar",
+        "g:\\Work\\Librerie\\slf4j-jdk-platform-logging-2.0.6.jar",
+        "g:\\Work\\Librerie\\slf4j-log4j13-1.0.1.jar",
+        "g:\\Work\\Librerie\\sqlite-jdbc-3.40.0.0.jar"
+    ]
+}
