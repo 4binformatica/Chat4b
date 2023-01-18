@@ -71,4 +71,43 @@ public class Database {
         }
         return false;
     }
+
+    public void updateIP(String username, String ip) throws SQLException{
+        String sql = "UPDATE users SET ip = ? WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, ip);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    }
+
+    public String getIP(String username) throws SQLException{
+        String sql = "SELECT ip FROM users WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        return rs.getString("ip");
+    }
+
+    public void removeUser(String username) throws SQLException{
+        String sql = "DELETE FROM users WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.executeUpdate();
+    }
+
+    public void updateUsername(String username, String newUsername) throws SQLException{
+        String sql = "UPDATE users SET username = ? WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, newUsername);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    }
+
+    public void updatePassword(String username, String newPassword) throws SQLException{
+        String sql = "UPDATE users SET password = ? WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, newPassword);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    }
 }

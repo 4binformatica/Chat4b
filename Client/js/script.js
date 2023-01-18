@@ -1,4 +1,12 @@
-let socket = new WebSocket("ws://chat4btest.azurewebsites.net:8887/");
+let socket = new WebSocket("ws://localhost:8887/");
+
+let ip;
+
+
+$(window).on("load", function () {
+    GetUserIP().then((t) => { ip = t; });
+});
+
 
 socket.addEventListener('open', (event) => {
     
@@ -51,7 +59,7 @@ let login = () => {
     let message = {
         "operation": "login",
         "username": username,
-        "ip": GetUserIP(),
+        "ip": ip,
         "receiver": "server",
         "data": password
 
@@ -65,7 +73,7 @@ let register = () => {
     let message = {
         "operation": "register",
         "username": username,
-        "ip": GetUserIP(),
+        "ip": ip,
         "receiver": "server",
         "data": password
 
@@ -73,15 +81,12 @@ let register = () => {
     sendToServer(JSON.stringify(message));
 }
 
-function GetUserIP(){
-    var ret_ip;
-    $.ajaxSetup({async: false});
-    $.get('http://jsonip.com/', function(r){ 
-      ret_ip = r.ip; 
+async function GetUserIP(){
+    //get the ip of the user
+    var ip = "xxx.xxx.xxx.xxx";
+    await $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
+        ip = data.ip;
     });
-    if(ret_ip == "undefined" || ret_ip == null || ret_ip == ""){
-        return "xxx.xxx.xxx.xxx"
-    }
-    return ret_ip;
+    return Promise.resolve(ip);
   }
 

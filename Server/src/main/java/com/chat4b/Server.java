@@ -49,6 +49,7 @@ public class Server extends WebSocketServer {
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
 		System.out.println("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+        clients.remove(conn);
 	}
 
 	@Override
@@ -72,6 +73,7 @@ public class Server extends WebSocketServer {
 	public void onError(WebSocket conn, Exception ex) {
 		System.err.println("an error occurred on connection " + conn.getRemoteSocketAddress()  + ":" + ex);
 	}
+    
 	
 	@Override
 	public void onStart() {
@@ -80,6 +82,12 @@ public class Server extends WebSocketServer {
 
     public void sendTo(String name, String message) {
         WebSocket conn = clients.get(name);
+        if (conn != null) {
+            conn.send(message);
+        }
+    }
+
+    public void sendTo(WebSocket conn, String message) {
         if (conn != null) {
             conn.send(message);
         }
@@ -96,6 +104,18 @@ public class Server extends WebSocketServer {
         if (conn != null) {
             conn.send(message.toJson());
         }
+    }
+
+    public boolean login(String username, String password, String ip){
+        try {
+            if(database.checkUser(username, password)){
+                database.updateIP(username, ip);
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean login(String username, String password){
@@ -116,7 +136,7 @@ public class Server extends WebSocketServer {
     public void manageOperation(Message msg){
         switch(msg.getOperation()){
             case "login":
-                if(login(msg.getUsername(), msg.getData())){
+                if(login(msg.getUsername(), msg.getData(), msg.getIp())){
                     System.out.println("Login successful " + msg.getUsername() + " " + msg.getData() + " " + msg.getIp());
                     sendTo(msg.getConn(), new Message("login", null, null, null, "success"));
                 }else{
@@ -130,7 +150,7 @@ public class Server extends WebSocketServer {
                 try {
                     System.out.println("Registering " + msg.getUsername() + " " + msg.getData() + " " + msg.getIp());
                     register(msg.getUsername(), msg.getData(), msg.getIp());
-                    sendTo(msg.getConn(), new Message("registerr", null, null, null, "success"));
+                    sendTo(msg.getConn(), new Message("register", null, null, null, "success"));
                 } catch (SQLException e) {
                     e.printStackTrace();
                     sendTo(msg.getConn(), new Message("register", null, null, null, "failed"));
