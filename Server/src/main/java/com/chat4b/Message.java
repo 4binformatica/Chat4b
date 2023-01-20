@@ -38,6 +38,15 @@ public class Message {
         this.data = data;
     }
 
+
+
+    public Message(String username, String data, String receiver){
+        this.username = username;
+        this.data = data;
+        this.receiver = receiver;
+    }
+    
+
     public void decode() {
         //split the json string message into an array
         String[] parts = message.split(",");

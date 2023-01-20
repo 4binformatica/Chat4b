@@ -4,23 +4,52 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chat.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="js/script.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <title>Chat4B</title>
 </head>
 <body>
-    <div class="container-1">
-        <div class="title" >
-            <h1 class="title">Chat4B</h1>
-        </div>
-        <div class="subtitle">
-            <h3 class="sub">server-to-server</h3>
-        </div>
-        <div class="button-login">
-            <a href="index.html" class="btn btn-white btn-animation">Home</a>
-        </div>
+    <div class="small-title">
+        <h4 class="small-title">Chat4B</h4>
     </div>
+    <div class="chat-container">
+        <div class="sidebar">
+          <div class="sidebar-header">Contacts</div>
+          <div class="contact-list">
+            <div class="contact active">
+              <div class="contact-name">John Doe</div>
+              <div class="contact-status">online</div>
+            </div>
+            <div class="contact">
+              <div class="contact-name">Jane Smith</div>
+              <div class="contact-status">offline</div>
+            </div>
+            <div class="contact">
+              <div class="contact-name">Bob Johnson</div>
+              <div class="contact-status">online</div>
+            </div>
+          </div>
+        </div>
+        <div class="main-content">
+          <div class="chat-header">Chat</div>
+          <div class="chat-messages">
+            <div class="message-container sent">
+              <div class="message-bubble sent">Hi there!</div>
+            </div>
+            <div class="message-container received">
+              <div class="message-bubble received">Hello! How can I help you today?</div>
+            </div>
+          </div>
+          <div class="chat-input-container">
+            <input type="text" class="chat-input" placeholder="Type a message...">
+            <button class="chat-submit-button">Send</button>
+          </div>
+        </div>
+      </div>
+      /div>
+      </div>
+      
 </body>
 </html>

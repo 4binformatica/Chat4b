@@ -1,0 +1,210 @@
+:root {
+    --red-crayola: #ed254eff;
+    --naples-yellow: #f9dc5cff;
+    --mint-cream: #f4fffdff;
+    --oxford-blue: #011936ff;
+    --black-coral: #465362ff;
+}
+
+body {
+    background-color: var(--oxford-blue);
+    overflow-x: hidden;
+}
+
+h4.small-title {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--mint-cream);
+    font-size: 2vw;
+}
+
+div.small-title {
+    /* border: 3px solid green;  */
+    position: relative;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    bottom: 15px;
+}
+
+.chat-container {
+    width: 600px;
+    height: 400px;
+    display: flex;
+  }
+  
+  .sidebar {
+    width: 200px;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .sidebar-header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .contact {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  
+  .contact:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .contact.active {
+    background-color: #ddd;
+  }
+  
+  .contact-name {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+  
+  .contact-status {
+    font-size: 14px;
+    color: #aaa;
+  }
+  
+  .main-content {
+    flex: 1;
+    margin-left: 10px;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .chat-container {
+    width: 600px;
+    height: 400px;
+    background-color: #011936;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+  }
+  
+  .sidebar {
+    width: 200px;
+    background-color: #fff;
+    color: #011936;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .sidebar-header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .contact {
+    padding: 10px;
+    border-bottom: 1px solid #011936;
+    cursor: pointer;
+  }
+  
+  .contact:hover {
+    background-color: #011936;
+    color: #fff;
+  }
+  
+  .contact.active {
+    background-color: #011936;
+    color: #fff;
+  }
+  
+  .contact-name {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+  
+  .contact-status {
+    font-size: 14px;
+    color: #011936;
+  }
+  
+  .main-content {
+    flex: 1;
+    margin-left: 10px;
+    background-color: #fff;
+    color: #011936;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .chat-header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .chat-messages {
+    height: 250px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
+  }
+  
+  .message-container {
+    margin-bottom: 10px;
+  }
+  
+  .message-bubble {
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .sent {
+    align-self: flex-end;
+    background-color: #011936;
+    color: #fff;
+  }
+  
+  .received {
+    align-self: flex-start;
+    background-color: #fff;
+    color: #011936;
+  }
+  
+  .chat-input-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .chat-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    margin-right: 10px;
+    background-color: #011936;
+    color: #fff;
+  }
+  
+  .chat-submit-button {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  

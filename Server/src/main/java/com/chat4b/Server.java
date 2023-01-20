@@ -3,6 +3,7 @@ package com.chat4b;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.java_websocket.WebSocket;
@@ -26,6 +27,7 @@ public class Server extends WebSocketServer {
         checkDatabase();
         database.databaseConnect();
         database.createUserTable();
+        database.createMessageTable();
 	}
 
     public void checkDatabase() throws SQLException, ClassNotFoundException{
@@ -42,7 +44,7 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		conn.send("Welcome to the server!"); //This method sends a message to the new client
+		sendTo(conn, new Message("Welcome", "Servr", "serverip", "Client,", "Welcome to the server"));
 		System.out.println("new connection to " + conn.getRemoteSocketAddress());
 	}
 
@@ -56,7 +58,12 @@ public class Server extends WebSocketServer {
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println("received message from "	+ conn.getRemoteSocketAddress() + ": " + message);
         Message msg = new Message(message, conn);
-        manageOperation(msg);
+        try {
+            manageOperation(msg);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         if(clients.containsKey(msg.getUsername())){
             clients.replace(msg.getUsername(), conn);
         }else{
@@ -93,10 +100,21 @@ public class Server extends WebSocketServer {
         }
     }
 
-    public void sendTo(String name, Message message) {
+    public void sendTo(String name, Message message) throws SQLException {
         WebSocket conn = clients.get(name);
         if (conn != null) {
             conn.send(message.toJson());
+        }
+    }
+
+    public void sendTo(Message message) throws SQLException {
+        WebSocket conn = clients.get(message.getReceiver());
+        if (conn != null) {
+            database.addMessage(message.getReceiver(), message);
+            conn.send(message.toJson());
+        }
+        else{
+            database.addMessage(message.getReceiver(), message);
         }
     }
 
@@ -133,12 +151,13 @@ public class Server extends WebSocketServer {
         database.newUser(username, password, ip);
     }
 
-    public void manageOperation(Message msg){
+    public void manageOperation(Message msg) throws SQLException{
         switch(msg.getOperation()){
             case "login":
                 if(login(msg.getUsername(), msg.getData(), msg.getIp())){
                     System.out.println("Login successful " + msg.getUsername() + " " + msg.getData() + " " + msg.getIp());
                     sendTo(msg.getConn(), new Message("login", null, null, null, "success"));
+
                 }else{
                     sendTo(msg.getConn(), new Message("login", null, null, null, "failed"));
                 }
@@ -154,6 +173,18 @@ public class Server extends WebSocketServer {
                 } catch (SQLException e) {
                     e.printStackTrace();
                     sendTo(msg.getConn(), new Message("register", null, null, null, "failed"));
+                }
+                break;
+            case "logout":
+                clients.remove(msg.getUsername());
+                break;
+            case "message":
+                sendTo(msg.getReceiver(), msg);
+                break;
+            case "getMessages":
+                ArrayList<Message> messages = database.getMessages(msg.getUsername());
+                for(Message m : messages){
+                    sendTo(msg.getReceiver(), m);
                 }
                 break;
             default:

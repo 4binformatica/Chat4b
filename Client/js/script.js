@@ -1,5 +1,5 @@
 let socket = new WebSocket("ws://localhost:8887/");
-
+let username;
 let ip;
 
 
@@ -25,6 +25,7 @@ socket.addEventListener('message', (event) => {
         case "login":
             if(data == "success"){
                 window.location.pathname = 'Client/chat.html';
+                this.username = username;
             }else{
                 alert("Login failed");
             }
@@ -44,13 +45,26 @@ socket.addEventListener('message', (event) => {
             }
             break;
             default:
-                alert("Unknown operation");
+                console.log(data);
     }
 })
 
 
 let sendToServer = (message) => {
     socket.send(message);
+}
+
+let sendMessage = () => {
+    let message = document.getElementById("message").value;
+    let receiver = document.getElementById("receiver").value;
+    let messageObject = {
+        "operation": "message",
+        "username": username,
+        "ip": ip,
+        "receiver": receiver,
+        "data": message
+    }
+    sendToServer(JSON.stringify(messageObject));
 }
 
 let login = () => {
@@ -62,6 +76,18 @@ let login = () => {
         "ip": ip,
         "receiver": "server",
         "data": password
+
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+let getMessages = () => {
+    let message = {
+        "operation": "getMessages",
+        "username": username,
+        "ip": ip,
+        "receiver": "server",
+        "data": "getMessages"
 
     }
     sendToServer(JSON.stringify(message));

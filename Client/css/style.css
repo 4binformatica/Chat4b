@@ -31,7 +31,7 @@ h1.title {
     font-size: 5vw;
     animation: slideInLeft;
     animation-duration: 2s;
-}
+}border: 3px solid green;
 
 div.subtitle {
     position: relative;
@@ -52,9 +52,9 @@ div.user-pass {
     /* border: 1px solid red; */
     position: relative;
     top: 80px;
-    left: 41%;
+    left: 42.7%;
     height: auto;
-    width: 10vw;
+    width: 15.5vw;
     line-height: 45px;
 }
 
@@ -87,7 +87,7 @@ input.pass {
     animation-duration: 3s;
   }
   
-  .btn:link,
+  .btn:link, 
   .btn:visited{
     text-decoration: none;
     text-transform:uppercase;
