@@ -1,10 +1,22 @@
-let socket = new WebSocket("ws://localhost:8887/");
-let username;
-let ip;
+
+
 
 
 $(window).on("load", function () {
-    GetUserIP().then((t) => { ip = t; });
+    GetUserIP().then((ip) => { storeValue("ip", ip); });
+    
+    //keepAlive function
+    setInterval(function () {
+        let message = {
+            "operation": "keepAlive",
+            "username": getStoredValue("username"),
+            "ip": getStoredValue("ip"),
+            "receiver": "server",
+            "data": "keepAlive"
+        }
+        sendToServer(JSON.stringify(message));
+    }, 10000);
+
 });
 
 
@@ -25,7 +37,7 @@ socket.addEventListener('message', (event) => {
         case "login":
             if(data == "success"){
                 window.location.pathname = 'Client/chat.html';
-                this.username = username;
+                storeValue("username", username);
             }else{
                 alert("Login failed");
             }
@@ -54,16 +66,15 @@ let sendToServer = (message) => {
     socket.send(message);
 }
 
-let sendMessage = () => {
-    let message = document.getElementById("message").value;
-    let receiver = document.getElementById("receiver").value;
+let sendMessage = (message, receiver) => {
     let messageObject = {
         "operation": "message",
-        "username": username,
-        "ip": ip,
+        "username": getStoredValue("username"),
+        "ip": getStoredValue("ip"),
         "receiver": receiver,
         "data": message
     }
+    console.log(messageObject);
     sendToServer(JSON.stringify(messageObject));
 }
 
@@ -73,7 +84,7 @@ let login = () => {
     let message = {
         "operation": "login",
         "username": username,
-        "ip": ip,
+        "ip": getStoredValue("ip"),
         "receiver": "server",
         "data": password
 
@@ -84,8 +95,8 @@ let login = () => {
 let getMessages = () => {
     let message = {
         "operation": "getMessages",
-        "username": username,
-        "ip": ip,
+        "username": getStoredValue("username"),
+        "ip": getStoredValue("ip"),
         "receiver": "server",
         "data": "getMessages"
 
@@ -99,7 +110,7 @@ let register = () => {
     let message = {
         "operation": "register",
         "username": username,
-        "ip": ip,
+        "ip": getStoredValue("ip"),
         "receiver": "server",
         "data": password
 
@@ -116,3 +127,4 @@ async function GetUserIP(){
     return Promise.resolve(ip);
   }
 
+  
