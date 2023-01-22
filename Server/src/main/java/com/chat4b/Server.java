@@ -44,7 +44,7 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		sendTo(conn, new Message("Welcome", "Servr", "serverip", "Client,", "Welcome to the server"));
+		sendTo(conn, new Message("Welcome", "Server", "serverip", "Client,", "Welcome to the server"));
 		System.out.println("new connection to " + conn.getRemoteSocketAddress());
 	}
 
@@ -96,19 +96,10 @@ public class Server extends WebSocketServer {
         }
     }
 
-    public void sendTo(WebSocket conn, String message) {
-        if (conn != null) {
-            conn.send(message);
-        }
-    }
 
     public void sendTo(String name, Message message) throws SQLException {
-        WebSocket conn = clients.get(name);
-        if (conn != null) {
-            conn.send(message.toJson());
-        } else {
-            System.out.println("User not found");
-        }
+        message.setReceiver(name);
+        sendTo(message);
     }
 
     public void sendTo(Message message) throws SQLException {
@@ -177,7 +168,8 @@ public class Server extends WebSocketServer {
                     System.out.println("Registering " + msg.getUsername() + " " + msg.getData() + " " + msg.getIp());
                     register(msg.getUsername(), msg.getData(), msg.getIp());
                     sendTo(msg.getConn(), new Message("register", msg.getUsername(), null, null, "success"));
-                } catch (SQLException e) {
+                } 
+                catch (SQLException e) {
                     e.printStackTrace();
                     sendTo(msg.getConn(), new Message("register", msg.getUsername(), null, null, "failed"));
                 }

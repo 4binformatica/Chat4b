@@ -121,6 +121,10 @@ public class Message {
         return getMessage();
     }
 
+    public void setReceiver(String name) {
+        this.receiver = name;
+    }
+
 
         
     

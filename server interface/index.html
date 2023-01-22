@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+</head>
+<body>
+    <div id="responses">
+        
+    </div>
+    <!--make a input fixed on the bottom of the screen-->
+    <div id="input" style="
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #f1f1f1;
+        padding: 10px;
+    ">
+        <!-- {"operation":"register","username":"S","ip":"se","receiver":"Server","data":"Welcome to the server"} -->
+        <input id="operation" placeholder="operation..." type="text" style="width: 50%;"/>
+        <input id="username" placeholder="username..." type="text" style="width: 50%;"/>
+        <input id="ip" placeholder="ip..." type="text" style="width: 50%;"/>
+        <input id="receiver" placeholder="receiver..." type="text" style="width: 50%;"/>
+        <input id="data" placeholder="data..." type="text" style="width: 50%;"/>
+        <button id="send">Send</button>
+    </div>
+    <script>
+        //create a websocket
+        var socket = new WebSocket("ws://localhost:8887");
+        //when the socket is open
+        socket.onopen = function(){
+            //send a message to the server
+            console.log("socket opened");
+        }
+        //when the socket receives a message
+        socket.onmessage = function(event){
+            //get the message
+            var message = event.data;
+            //get the responses div
+            var responses = document.getElementById("responses");
+            //create a new div
+            var div = document.createElement("div");
+            //set the div's innerHTML to the message
+            div.innerHTML = message;
+            //add the div to the responses div
+            responses.appendChild(div);
+        }
+        //when the send button is clicked
+        document.getElementById("send").onclick = function(){
+            //get the message input
+            var message = {};
+            message.operation = document.getElementById("operation").value;
+            message.username = document.getElementById("username").value;
+            message.ip = document.getElementById("ip").value;
+            message.receiver = document.getElementById("receiver").value;
+            message.data = document.getElementById("data").value;
+            //send the message to the server
+            socket.send(JSON.stringify(message));
+            //clear the message input
+            message.value = "";
+        }
+    </script>
+</body>
+</html>

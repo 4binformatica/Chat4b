@@ -69,8 +69,7 @@ public class Database {
     }
 
     public void newUser(String username, String password, String ip) throws SQLException{
-        String sql = "INSERT INTO users(Username, password, ip) VALUES(?,?,?)";
-
+        String sql = "INSERT INTO users(username, password, ip) VALUES(?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, username);
         pstmt.setString(2, password);
