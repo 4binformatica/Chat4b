@@ -118,13 +118,6 @@ let register = () => {
     sendToServer(JSON.stringify(message));
 }
 
-async function GetUserIP(){
-    //get the ip of the user
-    var ip = "xxx.xxx.xxx.xxx";
-    await $.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
-        ip = data.ip;
-    });
-    return Promise.resolve(ip);
-  }
+
 
   

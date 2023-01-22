@@ -19,7 +19,6 @@
         background-color: #f1f1f1;
         padding: 10px;
     ">
-        <!-- {"operation":"register","username":"S","ip":"se","receiver":"Server","data":"Welcome to the server"} -->
         <input id="operation" placeholder="operation..." type="text" style="width: 50%;"/>
         <input id="username" placeholder="username..." type="text" style="width: 50%;"/>
         <input id="ip" placeholder="ip..." type="text" style="width: 50%;"/>
@@ -29,7 +28,7 @@
     </div>
     <script>
         //create a websocket
-        var socket = new WebSocket("ws://localhost:8887");
+        var socket = new WebSocket("ws://87.4.163.109:8887/");
         //when the socket is open
         socket.onopen = function(){
             //send a message to the server

@@ -13,5 +13,3 @@ function getStoredValue(key) {
         return $.cookies.get(key);
     }
 }
-
-export { storeValue, getStoredValue };

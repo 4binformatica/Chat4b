@@ -44,7 +44,7 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		sendTo(conn, new Message("Welcome", "Server", "serverip", "Client,", "Welcome to the server"));
+		sendTo(conn, new Message("Welcome", "Server", "serverip", "Client", "Welcome to the server"));
 		System.out.println("new connection to " + conn.getRemoteSocketAddress());
 	}
 
@@ -185,6 +185,8 @@ public class Server extends WebSocketServer {
                 for(Message m : messages){
                     sendTo(m);
                 }
+                break;
+            case "keepAlive":
                 break;
             default:
                 break;
