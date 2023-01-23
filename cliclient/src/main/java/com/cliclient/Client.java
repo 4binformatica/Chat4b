@@ -2,6 +2,7 @@ package com.cliclient;
 
 import java.net.URI;
 import java.net.http.WebSocket;
+import java.time.Instant;
 import java.util.Scanner;
 
 import org.java_websocket.client.WebSocketClient;
@@ -17,7 +18,6 @@ public class Client extends WebSocketClient {
 
     
     Scanner input = new Scanner(System.in);
-    String ip;
     String username;
     
     void menu(){
@@ -56,7 +56,7 @@ public class Client extends WebSocketClient {
         String username = input.next();
         System.out.println("Enter password: ");
         String password = input.next();
-        Message message = new Message("login", username, ip, "server", password);
+        Message message = new Message("login", username, "server", password);
 
         send(message);
     }
@@ -66,7 +66,7 @@ public class Client extends WebSocketClient {
         String username = input.next();
         System.out.println("Enter password: ");
         String password = input.next();
-        Message message = new Message("register", username, ip, "server", password);
+        Message message = new Message("register", username, "server", password);
 
         send(message);
     }
@@ -76,7 +76,7 @@ public class Client extends WebSocketClient {
         String receiver = input.next();
         System.out.println("Enter message: ");
         String data = input.next();
-        Message message = new Message("message", username, ip, receiver, data);
+        Message message = new Message("message", username,  receiver, data);
 
         send(message);
     }
@@ -88,7 +88,7 @@ public class Client extends WebSocketClient {
         String receiver = input.next();
         System.out.println("Enter data: ");
         String data = input.next();
-        Message message = new Message(operation, username, ip, receiver, data);
+        Message message = new Message(operation, username, receiver, data, Instant.now().toString());
 
         send(message);
     }
@@ -150,6 +150,8 @@ public class Client extends WebSocketClient {
             case "Welcome":
                 System.out.println("Welcome to the server");
                 break;
+            case "pong":
+                System.out.println("pong " + message.getData());
             default:
                 System.out.println("Invalid operation");
                 break;

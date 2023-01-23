@@ -13,3 +13,11 @@ function getStoredValue(key) {
         return $.cookies.get(key);
     }
 }
+
+function deleteStoredValue(key) {
+    if (localStorage) {
+        localStorage.removeItem(key);
+    } else {
+        $.cookies.del(key);
+    }
+}

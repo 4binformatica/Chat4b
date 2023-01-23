@@ -21,7 +21,6 @@
     ">
         <input id="operation" placeholder="operation..." type="text" style="width: 50%;"/>
         <input id="username" placeholder="username..." type="text" style="width: 50%;"/>
-        <input id="ip" placeholder="ip..." type="text" style="width: 50%;"/>
         <input id="receiver" placeholder="receiver..." type="text" style="width: 50%;"/>
         <input id="data" placeholder="data..." type="text" style="width: 50%;"/>
         <button id="send">Send</button>
@@ -53,13 +52,12 @@
             var message = {};
             message.operation = document.getElementById("operation").value;
             message.username = document.getElementById("username").value;
-            message.ip = document.getElementById("ip").value;
             message.receiver = document.getElementById("receiver").value;
             message.data = document.getElementById("data").value;
+            //translate time into iso-8601
+            message.date = new Date().toISOString();
             //send the message to the server
-            socket.send(JSON.stringify(message));
-            //clear the message input
-            message.value = "";
+            socket.send(JSON.stringify(message));            
         }
     </script>
 </body>

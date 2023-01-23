@@ -20,33 +20,22 @@
     <div class="chat-container">
         <div class="sidebar">
           <div class="sidebar-header">Contacts</div>
-          <div class="contact-list">
-            <div class="contact active">
-              <div id="contact-enabled" class="contact-name">John Doe</div>
-              <div class="contact-status">online</div>
-            </div>
-            <div class="contact">
-              <div class="contact-name">Jane Smith</div>
-              <div class="contact-status">offline</div>
-            </div>
-            <div class="contact">
-              <div class="contact-name">Bob Johnson</div>
-              <div class="contact-status">online</div>
-            </div>
+          <button onClick="addContact()" class="add-contact-button">Add Contact</button>
+          <div id="contactList" class="contact-list">
           </div>
         </div>
         <div class="main-content">
           <div class="chat-header">Chat</div>
-          <div class="chat-messages">
+          <div id="messageList" class="chat-messages">
           </div>
           <div class="chat-input-container">
             <input id="message-input" type="text" class="chat-input" placeholder="Type a message...">
-            <button class="chat-submit-button">Send</button>
-          </div>
+            <button onClick="sendMessage()" class="chat-submit-button">Send</button>          </div>
         </div>
       </div>
-      /div>
       </div>
+
+      <button onClick="logout()" id="logout" class="logout-button">Logout</button>
       
 </body>
 </html>

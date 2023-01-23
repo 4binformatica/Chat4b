@@ -38,8 +38,7 @@ public class Database {
         // SQL statement for creating a new table
         String sql = "CREATE TABLE IF NOT EXISTS users (\n"
                 + "	username text PRIMARY KEY,\n"
-                + "	password text ,\n"
-                + "	ip text \n"
+                + "	password text \n"
                 + ");";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -56,7 +55,8 @@ public class Database {
         String sql = "CREATE TABLE IF NOT EXISTS messages (\n"
                 + "	username text ,\n"
                 + "	message text ,\n"
-                + "	receiver text \n"
+                + "	receiver text, \n"
+                + " date text \n"
                 + ");";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -68,13 +68,33 @@ public class Database {
         }
     }
 
-    public void newUser(String username, String password, String ip) throws SQLException{
-        String sql = "INSERT INTO users(username, password, ip) VALUES(?,?,?)";
+    public void createContactTable(){
+        // SQL statement for creating a new table
+        String sql = "CREATE TABLE IF NOT EXISTS contacts (\n"
+                + "	username text ,\n"
+                + "	contact text \n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            // create a new table
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public boolean newUser(String username, String password) throws SQLException{
+        if(checkUsername(username)){
+            System.out.println("Username already exists");
+            return false;
+        }
+        String sql = "INSERT INTO users(username, password) VALUES(?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, username);
         pstmt.setString(2, password);
-        pstmt.setString(3, ip);
         pstmt.executeUpdate();
+        return true;
     }
 
     public boolean checkUser(String username, String password) throws SQLException{
@@ -100,22 +120,6 @@ public class Database {
         return false;
     }
 
-    public void updateIP(String username, String ip) throws SQLException{
-        String sql = "UPDATE users SET ip = ? WHERE username = ?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, ip);
-        pstmt.setString(2, username);
-        pstmt.executeUpdate();
-    }
-
-    public String getIP(String username) throws SQLException{
-        String sql = "SELECT ip FROM users WHERE username = ?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, username);
-        ResultSet rs = pstmt.executeQuery();
-        return rs.getString("ip");
-    }
-
     public void removeUser(String username) throws SQLException{
         String sql = "DELETE FROM users WHERE username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -139,33 +143,79 @@ public class Database {
         pstmt.executeUpdate();
     }
 
-    public void addMessage(String receiver, Message msg) throws SQLException{
-        String sql = "INSERT INTO messages(username, message, receiver) VALUES(?,?,?)";
+    public void addMessage(Message msg) throws SQLException{
+        String sql = "INSERT INTO messages(username, message, receiver, date) VALUES(?,?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, msg.getUsername());
         pstmt.setString(2, msg.getData());
-        pstmt.setString(3, receiver);
+        pstmt.setString(3, msg.getReceiver());
+        pstmt.setString(4, msg.getDate());
         pstmt.executeUpdate();
     }
 
     public void removeMessage(String receiver, Message msg) throws SQLException{
-        String sql = "DELETE FROM messages WHERE username = ? AND message = ? AND receiver = ?";
+        String sql = "DELETE FROM messages WHERE username = ? AND message = ? AND receiver = ? AND date = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, msg.getUsername());
         pstmt.setString(2, msg.getData());
         pstmt.setString(3, receiver);
+        pstmt.setString(4, msg.getDate());
         pstmt.executeUpdate();
     }
 
-    public ArrayList<Message> getMessages(String receiver) throws SQLException{
+    /*public ArrayList<Message> getMessages(String receiver) throws SQLException{
         ArrayList<Message> messages = new ArrayList<>();
         String sql = "SELECT * FROM messages WHERE receiver = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, receiver);
         ResultSet rs = pstmt.executeQuery();
         while(rs.next()){
-            messages.add(new Message(rs.getString("username"), rs.getString("message"), rs.getString("receiver")));
+            messages.add(new Message("message", rs.getString("username"), receiver, rs.getString("message"), rs.getString("date")));
         }
         return messages;
+    }*/
+
+    //get send and received messages
+    public ArrayList<Message> getMessages(String username) throws SQLException{
+        //take all the message with the username as receiver and username
+        ArrayList<Message> messages = new ArrayList<>();
+        System.out.println("Getting messages for " + username);
+        String sql = "SELECT * FROM messages WHERE receiver = ? OR username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, username);
+        ResultSet rs = pstmt.executeQuery();
+        while(rs.next()){
+            messages.add(new Message("message", rs.getString("username"), rs.getString("receiver"), rs.getString("message"), rs.getString("date")));
+        }
+        return messages;
+    }
+
+    public void addContact(String username, String contact) throws SQLException{
+        String sql = "INSERT INTO contacts(username, contact) VALUES(?,?)";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, contact);
+        pstmt.executeUpdate();
+    }
+
+    public void removeContact(String username, String contact) throws SQLException{
+        String sql = "DELETE FROM contacts WHERE username = ? AND contact = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, contact);
+        pstmt.executeUpdate();
+    }
+
+    public ArrayList<String> getContacts(String username) throws SQLException{
+        ArrayList<String> contacts = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        while(rs.next()){
+            contacts.add(rs.getString("contact"));
+        }
+        return contacts;
     }
 }

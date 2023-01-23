@@ -1,6 +1,11 @@
 package com.chat4b;
 
+import java.time.Instant;
+
 import org.java_websocket.WebSocket;
+
+import com.google.gson.Gson;
+
 
 /**
  * Message
@@ -12,9 +17,9 @@ public class Message {
 
     private String operation;
     private String username;
-    private String ip;
     private String receiver;
     private String data;
+    private String date;
     private WebSocket conn;
 
 
@@ -30,58 +35,31 @@ public class Message {
         decode();
     }
 
-    Message(String operation, String username, String ip, String receiver, String data) {
+    Message(String operation, String username, String receiver, String data, String date) {
         this.operation = operation;
         this.username = username;
-        this.ip = ip;
         this.receiver = receiver;
         this.data = data;
+        this.date = date;
     }
 
-
-
-    public Message(String username, String data, String receiver){
+    Message(String operation, String username, String receiver, String data) {
+        this.operation = operation;
         this.username = username;
-        this.data = data;
         this.receiver = receiver;
+        this.data = data;
+        this.date = Instant.now().toString();
     }
     
 
     public void decode() {
-        //split the json string message into an array
-        String[] parts = message.split(",");
-        for(int i = 0; i < parts.length; i++){
-            String part = parts[i];
-            //split the key and value
-            String[] keyValue = part.split(":");
-            //remove the quotes from the key
-            String key = keyValue[0].replace("\"", "");
-            //remove the quotes from the value
-            String value = keyValue[1].replace("\"", "");
-            //remove the curly braces from the value
-            value = value.replace("{", "");
-            value = value.replace("}", "");
-            key = key.replace("{", "");
-            key = key.replace("}", "");
-
-            switch(key){
-                case "operation":
-                    operation = value;
-                    break;
-                case "username":
-                    username = value;
-                    break;
-                case "ip":
-                    ip = value;
-                    break;
-                case "receiver":
-                    receiver = value;
-                    break;
-                case "data":
-                    data = value;
-                    break;
-            }
-        }
+        Gson gson = new Gson();
+        Message msg = gson.fromJson(message, Message.class);
+        this.operation = msg.getOperation();
+        this.username = msg.getUsername();
+        this.receiver = msg.getReceiver();
+        this.data = msg.getData();
+        this.date = msg.getDate();
     }
 
     public String getOperation() {
@@ -90,10 +68,6 @@ public class Message {
 
     public String getUsername() {
         return username;
-    }
-
-    public String getIp() {
-        return ip;
     }
 
     public String getReceiver() {
@@ -108,12 +82,16 @@ public class Message {
         return message;
     }
 
+    public String getDate() {
+        return date;
+    }
+
     public WebSocket getConn() {
         return conn;
     }
 
     public String toJson(){
-        return "{\"operation\":\"" + operation + "\",\"username\":\"" + username + "\",\"ip\":\"" + ip + "\",\"receiver\":\"" + receiver + "\",\"data\":\"" + data + "\"}";
+        return "{\"operation\":\"" + operation + "\",\"username\":\"" + username  + "\",\"receiver\":\"" + receiver + "\",\"data\":\"" + data + "\",\"date\":\"" + date + "\"}";
     }
 
     @Override
