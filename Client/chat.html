@@ -35,10 +35,14 @@
           <div id="messageList" class="chat-messages">
           </div>
           <div class="chat-input-container">
-            <input id="message-input" type="text" class="chat-input" placeholder="Type a message...">
+            <input id="message-input" type="text" class="chat-input" placeholder="Type a message..." oninput="draft()">
             <button onClick="sendMessage()" class="chat-submit-button">
               <i class="fa-solid fa-share"></i>
-            </button>          
+            </button>                  
+            <input type="file" style="display: none;" id="image-input" accept="image/*" onchange="sendImage()">
+            <button class="chat-submit-button" onClick="document.getElementById('image-input').click()">
+              <i class="fa-solid fa-image"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -51,5 +55,11 @@
       <button onClick="deleteMsg()" id="deleteMsg" class="deleteMsg-button">
         <i class="fa-solid fa-trash"></i>
       </button>
+      <input type="file" style="display: none;" id="changeProfilePic-input" accept="image/*" onchange="changeProfilePic()">
+      <button onClick="document.getElementById('changeProfilePic-input').click()" id="changeProfilePic" class="changeProfilePic-button">
+        <i class="fa-solid fa-camera"></i>
+      </button>
+    </input>
+      
 </body>
 </html>

@@ -24,9 +24,14 @@ socket.onmessage = function(event) {
     let data = JSON.parse(event.data).data;
 
     switch(operation) {
+        case "loginID":
+            deleteStoredValue("loginID");
+            storeValue("loginID", data);
+            break;
         case "login":
             if(data === "success") {
                 storeValue("username", username);
+
                 window.location.pathname = 'Client/chat.html';
             } else {
                 alert("Login failed");

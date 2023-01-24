@@ -196,6 +196,18 @@ div.small-title {
     background-color: #fff;
     color: #011936;
   }
+
+  .image-send {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  .image-receive {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+  }
   
   .chat-input-container {
     display: flex;
@@ -219,6 +231,7 @@ div.small-title {
     color: #fff;
     border: none;
     cursor: pointer;
+    margin: 10px;
   }
 
   button.add-contact-button {
@@ -269,3 +282,37 @@ div.small-title {
     cursor: pointer;
     top: 15px;
   }
+  button.changeProfilePic-button {
+    padding: 10px;
+    position: relative;
+    width: 5vw;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    top: 15px;
+  }
+
+  
+  .contact-name {
+    display: flex;
+    vertical-align: middle;
+    line-height: normal;
+    font-size: 1.2em; 
+    font-weight: bold; 
+    margin: auto;
+  }
+
+  .contact-image {
+    display: flex;
+    vertical-align: middle;
+    line-height: normal;
+    border-radius: 50%;
+  }
+
+  
+
+  
+
+  

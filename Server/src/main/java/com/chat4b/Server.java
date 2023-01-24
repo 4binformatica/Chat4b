@@ -1,7 +1,6 @@
 package com.chat4b;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -10,8 +9,26 @@ import java.util.HashMap;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+
+import com.google.gson.Gson;
+
 import java.sql.SQLException;
 import java.time.Instant;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+
+
+
+
+
 
 public class Server extends WebSocketServer {
 
@@ -26,6 +43,8 @@ public class Server extends WebSocketServer {
         database.createUserTable();
         database.createMessageTable();
         database.createContactTable();
+        database.createLoginIDTable();
+        database.createDraftTable();
 	}
 
     public void checkDatabase() throws SQLException, ClassNotFoundException{
@@ -65,8 +84,7 @@ public class Server extends WebSocketServer {
         }
         try {
             manageOperation(msg);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
         if(clients.get(msg.getUsername()) == null){
@@ -144,12 +162,48 @@ public class Server extends WebSocketServer {
     }
 
     public boolean register(String username, String password) throws SQLException{
-        if(database.newUser(username, password))
-            return true;
-        return false;
+        return database.newUser(username, password, "https://i.ibb.co/NsJGFh6/istockphoto-522855255-612x612-modified.png");
     }
 
-    public void manageOperation(Message msg) throws SQLException{
+    public ImgbbResponse uploadImage(String base64Img) throws Exception {
+        String apiKey = "dcade2ebf0fb763a669491b8e637524c";
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        Gson gson = new Gson();
+        HttpPost httpPost = new HttpPost("https://api.imgbb.com/1/upload");
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody("key", apiKey, ContentType.TEXT_PLAIN);
+        builder.addTextBody("image", base64Img, ContentType.TEXT_PLAIN);
+        HttpEntity multipart = builder.build();
+        httpPost.setEntity(multipart);
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+
+        try {
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity, "UTF-8");
+            ImgbbResponse imgbbResponse = gson.fromJson(responseString, ImgbbResponse.class);
+            return imgbbResponse;
+        } finally {
+            response.close();
+        }
+    }
+
+    public String generateLoginID(String username) throws SQLException{
+        //create a random string of 10 characters based on the username
+        String loginID = "";
+        for(int i = 0; i < 10; i++){
+            loginID += username.charAt((int)(Math.random() * username.length()));
+        }
+        //check if the loginID is already in the database
+        if(database.checkLoginID(loginID)){
+            //if it is, generate a new one
+            generateLoginID(username);
+        }
+        //if it isn't, return the loginID
+        return loginID;
+    }
+
+
+    public void manageOperation(Message msg) throws Exception{
         
         switch(msg.getOperation()){
             case "login":
@@ -164,9 +218,26 @@ public class Server extends WebSocketServer {
                         }                        
                     }
                     System.out.println("Login successful " + msg.getUsername() + " " + msg.getData() );
-                    sendTo(msg.getConn(),  new Message("login", msg.getUsername(), msg.getUsername(), "success"));
+                    if(database.getLoginID(msg.getUsername()) != null){
+                        database.removeLoginID(msg.getUsername());
+                    }
+                    database.addLoginID(msg.getUsername(), generateLoginID(msg.getUsername()));
+                    sendTo(msg.getConn(), new Message("loginID", msg.getUsername(), msg.getUsername(), database.getLoginID(msg.getUsername())));
+                    sendTo(msg.getConn(), new Message("login", msg.getUsername(), msg.getUsername(), "success"));
                 }else{
                     sendTo(msg.getConn(), new Message("login", msg.getUsername(), msg.getUsername(), "Login failed, wrong username or password"));
+                }
+                break;
+            case "checkLoginID":
+                //check if tje loginID is outdated not generate new one
+                if(database.checkLoginIDOutdated(msg.getUsername())
+                && !database.getLoginID(msg.getUsername()).equals(msg.getData())){
+                    sendTo(msg.getConn(), new Message("checkLoginID", msg.getUsername(), msg.getUsername(), "false"));
+                }
+                if(database.checkLoginID(msg.getData())){
+                    sendTo(msg.getConn(), new Message("checkLoginID", msg.getUsername(), msg.getUsername(), "true"));
+                }else{
+                    sendTo(msg.getConn(), new Message("checkLoginID", msg.getUsername(), msg.getUsername(), "false"));
                 }
                 break;
             case "send":
@@ -180,8 +251,10 @@ public class Server extends WebSocketServer {
                 }
                 break;
             case "logout":
+                database.removeLoginID(msg.getUsername());
                 clients.remove(msg.getUsername());
                 break;
+            
             case "message":
                 database.addMessage(msg);
                 sendTo(msg);
@@ -192,9 +265,13 @@ public class Server extends WebSocketServer {
                 break;
             case "addContact":
                 if(database.userExist(msg.getData())){
+                    if(msg.getData().equals(msg.getUsername())){
+                        return;
+                    }
                     database.addContact(msg.getUsername(), msg.getData());
                     database.addContact(msg.getData(), msg.getUsername());
                     sendTo(msg.getConn(), new Message("addContact", msg.getUsername(), msg.getData(), "success"));
+                    sendReoload(msg.getData());
                 }else{
                     sendTo(msg.getConn(), new Message("addContact", msg.getUsername(), msg.getData(), "User does not exist"));
                 }
@@ -208,16 +285,44 @@ public class Server extends WebSocketServer {
                 ArrayList<Message> messages = database.getMessages(msg.getUsername());
                 System.out.println("Sending " + messages.size() + " messages to " + msg.getUsername());
                 for(Message m : messages){
-                    if((m.getReceiver().equals(msg.getUsername()) && m.getUsername().equals(msg.getData()) || (m.getReceiver().equals(msg.getData()) && m.getUsername().equals(msg.getUsername())))){
-                        sendTo(msg.getConn(), m);
+                    if(m.getReceiver() == null){
+                        System.out.println("Receiver is null");
                     }
+                    else{
+                        if((m.getReceiver().equals(msg.getUsername()) && m.getUsername().equals(msg.getData()) || (m.getReceiver().equals(msg.getData()) && m.getUsername().equals(msg.getUsername())))){
+                            sendTo(msg.getConn(), m);
+                        }
+                    }
+                    
                 }
+                break;
+            case "getProfilepic":
+                String profilePic = database.getProfilePic(msg.getData());
+                sendTo(msg.getConn(), new Message("profilePic", msg.getData(), msg.getUsername(), profilePic));
                 break;
             case "getContacts":
                 ArrayList<String> contacts = database.getContacts(msg.getUsername());
                 for(String contact : contacts){
-                    sendTo(msg.getConn(), new Message("contact", msg.getUsername(), msg.getUsername(), contact));
+                    sendTo(msg.getConn(), new Message("contact", contact, msg.getUsername(), database.getProfilePic(contact)));                    
                 }
+                break;
+            case "image":
+                ImgbbResponse imgbbResponse = uploadImage(msg.getData());
+                Message m = new Message("image", msg.getUsername(), msg.getReceiver(), imgbbResponse.getUrl());
+                database.addImage(m);
+                sendTo(msg.getConn(), m);
+                sendTo(msg.getReceiver(), m);
+                break;
+            case "changeProfilePic":
+                ImgbbResponse imgbbResponse2 = uploadImage(msg.getData());
+                database.changeProfilePic(msg.getUsername(), imgbbResponse2.getUrl());
+                break;
+            case "getDraft":
+                String draft = database.getDraft(msg.getUsername(), msg.getReceiver());
+                sendTo(msg.getConn(), new Message("draft", msg.getUsername(), msg.getReceiver(), draft));
+                break;
+            case "saveDraft":
+                database.createDraft(msg.getUsername(), msg.getData(), msg.getReceiver());
                 break;
             case "ping":
                 String t1 = msg.getDate();
