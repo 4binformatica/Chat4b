@@ -10,8 +10,9 @@
     <script src="js/cookie.js"></script>
     <script src="js/instruction.js"></script>
     <script src="js/chat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <title>Chat4B</title>
+    <title>Chat4BB</title>
 </head>
 <body>
     <div class="small-title">
@@ -20,7 +21,12 @@
     <div class="chat-container">
         <div class="sidebar">
           <div class="sidebar-header">Contacts</div>
-          <button onClick="addContact()" class="add-contact-button">Add Contact</button>
+          <button onClick="addContact()" class="add-contact-button">
+            <i class="fa-solid fa-user-plus"></i>
+          </button>
+          <button onClick="deteleContact()" id="deleteContact" class="delete-contact-button">
+            <i class="fa-solid fa-user-minus"></i>
+            </button>
           <div id="contactList" class="contact-list">
           </div>
         </div>
@@ -30,12 +36,20 @@
           </div>
           <div class="chat-input-container">
             <input id="message-input" type="text" class="chat-input" placeholder="Type a message...">
-            <button onClick="sendMessage()" class="chat-submit-button">Send</button>          </div>
+            <button onClick="sendMessage()" class="chat-submit-button">
+              <i class="fa-solid fa-share"></i>
+            </button>          
+          </div>
         </div>
       </div>
       </div>
 
-      <button onClick="logout()" id="logout" class="logout-button">Logout</button>
-      
+      <button onClick="logout()" id="logout" class="logout-button">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+
+      <button onClick="deleteMsg()" id="deleteMsg" class="deleteMsg-button">
+        <i class="fa-solid fa-trash"></i>
+      </button>
 </body>
 </html>

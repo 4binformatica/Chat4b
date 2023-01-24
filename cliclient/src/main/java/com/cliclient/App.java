@@ -15,7 +15,7 @@ public class App
 
     public static void main( String[] args ) throws URISyntaxException
     {
-        Client client = new Client(new URI("ws://87.4.163.109:8887/" ));
+        Client client = new Client(new URI("ws://192.168.137.131:8887/" ));
         
 
         System.out.println();

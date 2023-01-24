@@ -135,6 +135,17 @@ public class Database {
         pstmt.executeUpdate();
     }
 
+    public boolean userExist(String username) throws SQLException{
+        String sql = "SELECT * FROM users WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
     public void updatePassword(String username, String newPassword) throws SQLException{
         String sql = "UPDATE users SET password = ? WHERE username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -205,6 +216,15 @@ public class Database {
         pstmt.setString(1, username);
         pstmt.setString(2, contact);
         pstmt.executeUpdate();
+
+        //remove all messages between the two users
+        String sql2 = "DELETE FROM messages WHERE (username = ? AND receiver = ?) OR (username = ? AND receiver = ?)";
+        PreparedStatement pstmt2 = connection.prepareStatement(sql2);
+        pstmt2.setString(1, username);
+        pstmt2.setString(2, contact);
+        pstmt2.setString(3, contact);
+        pstmt2.setString(4, username);
+        pstmt2.executeUpdate();
     }
 
     public ArrayList<String> getContacts(String username) throws SQLException{
@@ -217,5 +237,15 @@ public class Database {
             contacts.add(rs.getString("contact"));
         }
         return contacts;
+    }
+
+    public boolean removeMessageByDate(String receiver, String date) throws SQLException{
+        System.out.println("receiver: " + receiver + " date: " + date);
+        String sql = "DELETE FROM messages WHERE receiver = ? AND date = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, receiver);
+        pstmt.setString(2, date);
+        pstmt.executeUpdate();
+        return true;
     }
 }

@@ -1,4 +1,5 @@
-
+let cancelMsg = false;
+let cancelContact = false;
 
 socket.onopen = function (event) {
     keepAlive();
@@ -88,7 +89,7 @@ let getSelectedContactName = () => {
     let contactList = document.getElementById("contactList").children;
     for (let i = 0; i < contactList.length; i++) {
         if (contactList[i].id == "active") {
-            return contactList[i].innerHTML;
+            return contactList[i].innerText;
         }
     }
 }
@@ -171,6 +172,29 @@ let logout = () => {
     window.location.pathname = 'Client/index.html';
 }
 
+let deleteMsg = () => {
+    if(cancelMsg){
+        cancelMsg = false;
+        document.getElementById("deleteMsg").style.backgroundColor = "#011936";
+    }
+    else{
+        cancelMsg = true;
+        document.getElementById("deleteMsg").style.backgroundColor = "red";
+    }
+}
+
+let deteleContact = () => {
+    if(cancelContact){
+        cancelContact = false;
+        document.getElementById("deleteContact").style.backgroundColor = "#011936";
+    }
+    else{
+        cancelContact = true;
+        document.getElementById("deleteContact").style.backgroundColor = "red";
+    }
+}
+
+
 
 socket.addEventListener('message', (event) => {
     console.log(event.data);
@@ -178,6 +202,7 @@ socket.addEventListener('message', (event) => {
     username = JSON.parse(event.data).username;
     receiver = JSON.parse(event.data).receiver;
     data = JSON.parse(event.data).data;
+    date = JSON.parse(event.data).date;
 
     switch(operation){
         case "message":
@@ -192,10 +217,29 @@ socket.addEventListener('message', (event) => {
                     message.className = "message-container received";
                 }
                 message.innerHTML = data; 
+                message.onclick = function() {
+                    message.date = date;
+                    if(cancelMsg){
+                        let message1 = {
+                            "operation": "removeMessage",
+                            "username": getStoredValue("username"),
+                            "receiver": getSelectedContactName(),
+                            "data": message.date,
+                            "date": new Date().toISOString()
+                            
+                        }
+                        sendToServer(JSON.stringify(message1));
+                        reloadMessages();
+                    }
+                }
                 document.getElementById("messageList").appendChild(message);
                 //scroll to bottom
                 document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
             }
+            break;
+        case "reload":
+            reloadContacts();
+            reloadMessages();
             break;
         case "contact":
             var contact = document.createElement('div');
@@ -208,15 +252,31 @@ socket.addEventListener('message', (event) => {
                 let contactList = document.getElementById("contactList").children;
                 for (let i = 0; i < contactList.length; i++) {
                     contactList[i].id = "";
+                    contactList[i].style.backgroundColor = "white";
+                    contactList[i].style.color = "black";
                 }
                 contact.id = "active";
+                contact.style.backgroundColor = "#011936";
+                contact.style.color = "white";
+                contact.style.borderRadius = "5px";
 
                 getMessages(getSelectedContactName());
+                if(cancelContact){
+                    let message = {
+                        "operation": "removeContact",
+                        "username": getStoredValue("username"),
+                        "receiver": "server",
+                        "data": getSelectedContactName(),
+                        "date": new Date().toISOString()
+                    }
+                    sendToServer(JSON.stringify(message));
+                    reloadContacts();
+                    return;
+                }
             }
             document.getElementById("contactList").appendChild(contact);
             break;
-            default:
-                console.log(data);
+        default:
+            console.log(data);
     }
-
-})
+});

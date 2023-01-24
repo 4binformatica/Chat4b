@@ -3,11 +3,13 @@
     --naples-yellow: #f9dc5cff;
     --mint-cream: #f4fffdff;
     --oxford-blue: #011936ff;
-    --black-coral: #465362ff;
+    --black-coral: hsl(212, 17%, 33%);
+    --sfondo: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(255,0,49,1) 100%);
+    --font: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
-    background-color: var(--oxford-blue);
+    background: var(--sfondo);
     overflow-x: hidden;
 }
 
@@ -67,6 +69,7 @@ div.small-title {
   }
   
   .contact-name {
+    font-family: var(--font);
     font-size: 18px;
     margin-bottom: 5px;
   }
@@ -85,11 +88,11 @@ div.small-title {
   }
   
   .chat-container {
-    width: 600px;
+    width: 95%;
     height: 400px;
     background-color: #011936;
     color: #fff;
-    border-radius: 10px;
+    border-radius: 20px;
     padding: 10px;
     display: flex;
   }
@@ -100,11 +103,13 @@ div.small-title {
     color: #011936;
     border-radius: 10px;
     padding: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
   
   .sidebar-header {
     font-size: 20px;
-    font-weight: bold;
+    font-family: var(--font);
     text-align: center;
     margin-bottom: 10px;
   }
@@ -152,6 +157,7 @@ div.small-title {
   
   .chat-header {
     font-size: 20px;
+    font-family: var(--font);
     font-weight: bold;
     text-align: center;
     margin-bottom: 10px;
@@ -161,6 +167,10 @@ div.small-title {
     height: 250px;
     overflow-y: scroll;
     margin-bottom: 10px;
+  }
+
+  div.message-container.sent {
+    text-align: right; !important;
   }
   
   .message-container {
@@ -173,13 +183,16 @@ div.small-title {
   }
   
   .sent {
-    align-self: flex-end;
+    font-family: var(--font);
     background-color: #011936;
+    border-radius: 10px;
+    width: 100%;
     color: #fff;
   }
   
   .received {
     align-self: flex-start;
+    font-family: var(--font);
     background-color: #fff;
     color: #011936;
   }
@@ -207,4 +220,52 @@ div.small-title {
     border: none;
     cursor: pointer;
   }
+
+  button.add-contact-button {
+    padding: 10px;
+    position: relative;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 0px;
+    bottom: 30px;
+  }
   
+  button.delete-contact-button {
+    padding: 10px;
+    position: relative;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 0px;
+    bottom: 30px;
+    left: 110px;
+  }
+
+  button.logout-button {
+    padding: 10px;
+    position: relative;
+    width: 5vw;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    top: 15px;
+  }
+
+  button.deleteMsg-button {
+    padding: 10px;
+    position: relative;
+    width: 5vw;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    top: 15px;
+  }

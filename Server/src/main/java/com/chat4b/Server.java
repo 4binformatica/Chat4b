@@ -138,6 +138,11 @@ public class Server extends WebSocketServer {
         return false;
     }
 
+    public void sendReoload(String username) throws SQLException{
+        Message msg = new Message("reload", "Server", username, "reload");
+        sendTo(username, msg);
+    }
+
     public boolean register(String username, String password) throws SQLException{
         if(database.newUser(username, password))
             return true;
@@ -181,19 +186,29 @@ public class Server extends WebSocketServer {
                 database.addMessage(msg);
                 sendTo(msg);
                 break;
+            case "removeMessage":
+                database.removeMessageByDate(msg.getReceiver(), msg.getData());
+                sendReoload(msg.getReceiver());
+                break;
             case "addContact":
-                database.addContact(msg.getUsername(), msg.getData());
-                database.addContact(msg.getData(), msg.getUsername());
+                if(database.userExist(msg.getData())){
+                    database.addContact(msg.getUsername(), msg.getData());
+                    database.addContact(msg.getData(), msg.getUsername());
+                    sendTo(msg.getConn(), new Message("addContact", msg.getUsername(), msg.getData(), "success"));
+                }else{
+                    sendTo(msg.getConn(), new Message("addContact", msg.getUsername(), msg.getData(), "User does not exist"));
+                }
                 break;
             case "removeContact":
                 database.removeContact(msg.getUsername(), msg.getData());
                 database.removeContact(msg.getData(), msg.getUsername());
+                sendReoload(msg.getData());
                 break;
             case "getMessages":
                 ArrayList<Message> messages = database.getMessages(msg.getUsername());
                 System.out.println("Sending " + messages.size() + " messages to " + msg.getUsername());
                 for(Message m : messages){
-                    if(m.getReceiver().equals(msg.getData()) || m.getUsername().equals(msg.getData())){
+                    if((m.getReceiver().equals(msg.getUsername()) && m.getUsername().equals(msg.getData()) || (m.getReceiver().equals(msg.getData()) && m.getUsername().equals(msg.getUsername())))){
                         sendTo(msg.getConn(), m);
                     }
                 }
