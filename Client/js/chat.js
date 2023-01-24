@@ -1,6 +1,7 @@
 let cancelMsg = false;
 let cancelContact = false;
 
+/* Opening a socket connection. */
 socket.onopen = function (event) {
     keepAlive();
     setInterval(keepAlive, 10000);
@@ -8,6 +9,9 @@ socket.onopen = function (event) {
     isLogged();
 };
 
+/**
+ * It takes the value of the message-input element, and sends it to the server.
+ */
 let draft = () => {
     let message = document.getElementById("message-input").value;
     let messageDraft = {
@@ -20,6 +24,9 @@ let draft = () => {
     sendToServer(JSON.stringify(messageDraft));
 }
 
+/**
+ * If the user is logged in, send a message to the server to check if the loginID is still valid.
+ */
 let isLogged = () => {
     let username = getStoredValue("username");
     let loginID = getStoredValue("loginID");
@@ -34,6 +41,9 @@ let isLogged = () => {
 
 }
 
+/**
+ * Every 10 seconds, send a message to the server to let it know that the client is still connected.
+ */
 let keepAlive = function () {
     let message = {
         "operation": "keepAlive",
@@ -45,6 +55,9 @@ let keepAlive = function () {
     sendToServer(JSON.stringify(message));
 }
 
+/**
+ * GetContacts() is a function that sends a message to the server to get the contacts of the user.
+ */
 let getContacts = () => {
     let message = {
         "operation": "getContacts",
@@ -57,6 +70,12 @@ let getContacts = () => {
     sendToServer(JSON.stringify(message));
 }
 
+/**
+ * "getMessages" is a function that takes a name as a parameter and returns a message object with the
+ * properties "operation", "username", "receiver", "data", and "date".
+ * 
+ * @param name the name of the user you want to get messages from
+ */
 let getMessages = (name) => {
     let message = {
         "operation": "getMessages",
@@ -70,6 +89,9 @@ let getMessages = (name) => {
 }
 
 
+/**
+ * It takes the input from the user and sends it to the server.
+ */
 let addContact = () => {
     let person = prompt("Please enter the contact name", "Contact name");
     let message = {
@@ -84,11 +106,20 @@ let addContact = () => {
     reloadContacts();
 }
 
+/**
+ * When the user clicks the button, the HTML element with the id of contactList will be emptied, and
+ * then the getContacts function will be called.
+ */
 let reloadContacts = () => {
     document.getElementById("contactList").innerHTML = "";
     getContacts();
 }
 
+/**
+ * Get the name of the selected contact from the contact list.
+ * 
+ * @return The name of the contact that is selected.
+ */
 let getSelectedContactName = () => {
     let contactList = document.getElementById("contactList").children;
     for (let i = 0; i < contactList.length; i++) {
@@ -98,6 +129,11 @@ let getSelectedContactName = () => {
     }
 }
 
+/**
+ * It sends a message to the server asking for the profile picture of a user.
+ * 
+ * @param username1 The username of the person whose profile picture you want to show.
+ */
 let showProfilePic = (username1) => {
     let message = {
         "operation": "getProfilePic",
@@ -109,6 +145,9 @@ let showProfilePic = (username1) => {
     sendToServer(JSON.stringify(message));
 }
 
+/**
+ * It takes the file from the input, converts it to base64, and sends it to the server.
+ */
 let changeProfilePic = () => {
     let file = document.getElementById("changeProfilePic-input").files[0];
     let reader = new FileReader();
@@ -127,6 +166,9 @@ let changeProfilePic = () => {
     }
 }
 
+  /**
+   * It takes an image from the input, converts it to base64 and sends it to the server.
+   */
   let sendImage = async () => {
     let image = document.getElementById("image-input").files[0];
     let reader = new FileReader();
@@ -147,6 +189,12 @@ let changeProfilePic = () => {
 }
   
 
+/**
+ * It takes the message from the input field, gets the selected contact name, creates a message object,
+ * sends the message to the server, clears the input field, and reloads the messages.
+ * 
+ * @return the value of the variable message.
+ */
 let sendMessage = async () => {   
     let message = document.getElementById("message-input").value;
     if(message == ""){
@@ -167,11 +215,18 @@ let sendMessage = async () => {
     reloadMessages();
 }
 
+/**
+ * It clears the message list and then reloads it with the messages from the selected contact.
+ */
 let reloadMessages = () => {
     document.getElementById("messageList").innerHTML = "";
     getMessages(getSelectedContactName());
 }
 
+/**
+ * It sends a logout message to the server, deletes the username from local storage, and redirects the
+ * user to the login page.
+ */
 let logout = () => {
     let message = {
         "operation": "logout",
@@ -185,6 +240,11 @@ let logout = () => {
     window.location.pathname = 'Client/index.html';
 }
 
+/**
+ * If the variable cancelMsg is true, then set it to false and change the background color of the
+ * element with the id "deleteMsg" to #011936. If the variable cancelMsg is false, then set it to true
+ * and change the background color of the element with the id "deleteMsg" to red.
+ */
 let deleteMsg = () => {
     if(cancelMsg){
         cancelMsg = false;
@@ -196,6 +256,11 @@ let deleteMsg = () => {
     }
 }
 
+/**
+ * If the variable cancelContact is true, then set it to false and change the background color of the
+ * button to #011936. If the variable cancelContact is false, then set it to true and change the
+ * background color of the button to red.
+ */
 let deteleContact = () => {
     if(cancelContact){
         cancelContact = false;
@@ -209,6 +274,8 @@ let deteleContact = () => {
 
 
 
+/* The above code is listening for messages from the server. When a message is received, the code
+parses the message and performs the appropriate action. */
 socket.addEventListener('message', (event) => {
     console.log(event.data);
     operation = JSON.parse(event.data).operation;

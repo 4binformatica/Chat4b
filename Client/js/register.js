@@ -1,6 +1,10 @@
 let username;
 let password;
 
+/**
+ * When the register button is clicked, the username and password are stored in variables, and then a
+ * message is sent to the server with the username and password.
+ */
 let register = () => {
     this.username = document.getElementById("username1").value;
     this.password = document.getElementById("password1").value;
@@ -14,6 +18,7 @@ let register = () => {
     sendToServer(JSON.stringify(message));
 }
 
+/* Listening for a message from the server. */
 socket.addEventListener('message', (event) => {
     console.log(event.data);
     operation = JSON.parse(event.data).operation;

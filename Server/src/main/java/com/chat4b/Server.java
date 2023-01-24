@@ -47,6 +47,9 @@ public class Server extends WebSocketServer {
         database.createDraftTable();
 	}
 
+    /**
+     * If the database exists, connect to it. If it doesn't exist, create it
+     */
     public void checkDatabase() throws SQLException, ClassNotFoundException{
         File f = new File("database.db");
         if(f.exists() && !f.isDirectory()) { 
@@ -59,14 +62,27 @@ public class Server extends WebSocketServer {
         }
     }
 
-	@Override
-	public void onOpen(WebSocket conn, ClientHandshake handshake) {
+	/**
+     * When a new connection is made, send a welcome message to the client
+     * 
+     * @param conn The connection that was just opened.
+     * @param handshake The handshake object contains the headers sent by the client.
+     */
+    public void onOpen(WebSocket conn, ClientHandshake handshake) {
 		sendTo(conn, new Message("Welcome", "Server", "Client", "Welcome to the server"));
 		System.out.println("new connection to " + conn.getRemoteSocketAddress());
 	}
 
-	@Override
-	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+	/**
+     * When a connection is closed, remove it from the list of connections
+     * 
+     * @param conn The connection that is closing.
+     * @param code The codes can be looked up [here](https://tools.ietf.org/html/rfc6455#section-7.4.1)
+     * @param reason The reason for closing the connection. This must be provided as per the WebSocket
+     * protocol.
+     * @param remote true if the closing of the connection was initiated by the remote host.
+     */
+    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
 		System.out.println("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
         for(String key : clients.keySet()){
             if(clients.get(key).contains(conn)){
@@ -76,8 +92,9 @@ public class Server extends WebSocketServer {
         }
 	}
 
-	@Override
-	public void onMessage(WebSocket conn, String message) {	
+    @Override
+	// A method that is called when a message is received from the client.
+    public void onMessage(WebSocket conn, String message) {	
         Message msg = new Message(message, conn);
         if(!msg.getOperation().equals( "keepAlive")){
             System.out.println("received message from "	+ conn.getRemoteSocketAddress() + ": " + message);
@@ -99,22 +116,35 @@ public class Server extends WebSocketServer {
 
 	}
 
-	@Override
-	public void onMessage( WebSocket conn, ByteBuffer message ) {
+    @Override
+	// A method that is called when a message is received.
+    public void onMessage( WebSocket conn, ByteBuffer message ) {
 		System.out.println("received ByteBuffer from "	+ conn.getRemoteSocketAddress());
 	}
 
-	@Override
-	public void onError(WebSocket conn, Exception ex) {
+	/**
+     * If an error occurs, print the error to the console
+     * 
+     * @param conn The WebSocket connection that has been closed.
+     * @param ex The exception that occurred.
+     */
+    public void onError(WebSocket conn, Exception ex) {
 		System.err.println("an error occurred on connection " + conn.getRemoteSocketAddress()  + ":" + ex);
 	}
     
 	
 	@Override
-	public void onStart() {
+    // A method that is called when the activity is started.
+    public void onStart() {
 		System.out.println("server started successfully");
 	}
 
+    /**
+     * Send a message to all clients with the given name.
+     * 
+     * @param name The name of the user you want to send the message to.
+     * @param message The message to be sent to the client.
+     */
     public void sendTo(String name, String message) {
         for(WebSocket conn : clients.get(name)){
             if (conn != null) {
@@ -123,12 +153,23 @@ public class Server extends WebSocketServer {
         }
     }
 
-
+    /**
+     * This function sends a message to a user with the given name
+     * 
+     * @param name The name of the user you want to send the message to.
+     * @param message The message to be sent.
+     */
     public void sendTo(String name, Message message) throws SQLException {
         message.setReceiver(name);
         sendTo(message);
     }
 
+    /**
+     * It sends a message to a user if the user is online.
+     * </code>
+     * 
+     * @param message The message object that contains the message, sender, and receiver.
+     */
     public void sendTo(Message message) throws SQLException {
         System.out.println(clients.get(message.getReceiver()) + " " + message.getReceiver());
         for(WebSocket conn : clients.get(message.getReceiver())){
@@ -139,12 +180,25 @@ public class Server extends WebSocketServer {
         }
     } 
 
+    /**
+     * It sends a message to a specific connection.
+     * 
+     * @param conn The connection to send the message to.
+     * @param message The message to send.
+     */
     public void sendTo(WebSocket conn, Message message) {
         if (conn != null) {
             conn.send(message.toJson());
         }
     }
 
+    /**
+     * If the database checkUser function returns true, return true. Otherwise, return false
+     * 
+     * @param username String
+     * @param password String
+     * @return A boolean value.
+     */
     public boolean login(String username, String password){
         try {
             if(database.checkUser(username, password)){
@@ -156,15 +210,33 @@ public class Server extends WebSocketServer {
         return false;
     }
 
+    /**
+     * It sends a message to a user with the message "reload" and the sender "Server"
+     * 
+     * @param username The username of the user you want to send the message to.
+     */
     public void sendReoload(String username) throws SQLException{
         Message msg = new Message("reload", "Server", username, "reload");
         sendTo(username, msg);
     }
 
+    /**
+     * This function takes in a username and password and returns a boolean value
+     * 
+     * @param username The username of the user
+     * @param password The password of the user
+     * @return A boolean value.
+     */
     public boolean register(String username, String password) throws SQLException{
         return database.newUser(username, password, "https://i.ibb.co/NsJGFh6/istockphoto-522855255-612x612-modified.png");
     }
 
+    /**
+     * It takes a base64 encoded image and uploads it to imgbb.com
+     * 
+     * @param base64Img The base64 encoded image.
+     * @return A JSON object with the following structure:
+     */
     public ImgbbResponse uploadImage(String base64Img) throws Exception {
         String apiKey = "dcade2ebf0fb763a669491b8e637524c";
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -187,6 +259,13 @@ public class Server extends WebSocketServer {
         }
     }
 
+    /**
+     * It generates a random string of 10 characters based on the username, checks if the loginID is
+     * already in the database, and if it is, generates a new one
+     * 
+     * @param username the username of the user
+     * @return The loginID is being returned.
+     */
     public String generateLoginID(String username) throws SQLException{
         //create a random string of 10 characters based on the username
         String loginID = "";
@@ -202,7 +281,11 @@ public class Server extends WebSocketServer {
         return loginID;
     }
 
-
+    /**
+     * It handles all the messages that are sent to the server
+     * 
+     * @param msg The message object that contains all the information about the message
+     */
     public void manageOperation(Message msg) throws Exception{
         
         switch(msg.getOperation()){

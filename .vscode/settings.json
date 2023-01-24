@@ -20,5 +20,8 @@
     "java.project.sourcePaths": [
         "server\\src\\main\\java\\com\\chat4b"
     ],
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "docwriter.style": "Javadoc",
+    "docwriter.progress.trackFunctions": false,
+    "docwriter.progress.trackMethods": false
 }

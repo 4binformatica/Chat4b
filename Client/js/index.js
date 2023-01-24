@@ -1,4 +1,8 @@
 
+/**
+ * It takes the username and password from the login form, creates a JSON object, and sends it to the
+ * server.
+ */
 let login = function() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
@@ -17,6 +21,7 @@ socket.onopen = function() {
     console.log("Connection established!");
 }
 
+/* Listening for a message from the server. */
 socket.onmessage = function(event) {
     let operation = JSON.parse(event.data).operation;
     let username = JSON.parse(event.data).username;

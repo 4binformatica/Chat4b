@@ -2,7 +2,6 @@ package com.chat4b;
 
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import org.java_websocket.server.WebSocketServer;
 
