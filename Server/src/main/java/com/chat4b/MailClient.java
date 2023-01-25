@@ -7,22 +7,26 @@ import java.util.Properties;
 
 public class MailClient {
     private Session session;
+    private String username;
+    private String password;
 
    // Creating a new session with the given properties.
-    public MailClient(String host, boolean starttls, boolean auth, int port) {
+    public MailClient(String host, int port, boolean starttls, boolean auth, String user, String pass) {
 
+        this.username = user;
+        this.password = pass;
         Properties props = new Properties();
         //yandex.ru smtp settings
-        props.put("mail.smtp.host", "smtp.yandex.ru");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.starttls.enable", starttls);
+        props.put("mail.smtp.auth", auth);
+        props.put("mail.smtp.port", port);
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
 
         session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("no-reply@kapindustries.it", "[redacted]");
+                return new PasswordAuthentication(username, password);
             }
         });
     }

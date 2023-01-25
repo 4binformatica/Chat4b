@@ -35,6 +35,7 @@ public class Server extends WebSocketServer {
     HashMap <String, ArrayList<WebSocket>> clients = new HashMap<String, ArrayList<WebSocket>>();
     Database database = new Database();
     MailClient mailClient;
+    Config config;
 
     /*  
      * Mail
@@ -46,9 +47,10 @@ public class Server extends WebSocketServer {
      */
     
 
-	public Server(InetSocketAddress address) throws ClassNotFoundException, SQLException {
+	public Server(InetSocketAddress address, Config config) throws ClassNotFoundException, SQLException {
 		super(address);
-        mailClient = new MailClient("smtp.yandex.com", true, true, 465);
+        mailClient = new MailClient(config.getHost(), config.getPort(), config.isMailAuth(), config.isMailStarttls(), config.getMailUser(), config.getMailPassword());
+        this.config = config;
         checkDatabase();
         database.databaseConnect();
         database.createUserTable();
@@ -250,7 +252,7 @@ public class Server extends WebSocketServer {
      * @return A JSON object with the following structure:
      */
     public ImgbbResponse uploadImage(String base64Img) throws Exception {
-        String apiKey = "dcade2ebf0fb763a669491b8e637524c";
+        String apiKey = config.getImgbbApiKey();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         Gson gson = new Gson();
         HttpPost httpPost = new HttpPost("https://api.imgbb.com/1/upload");
