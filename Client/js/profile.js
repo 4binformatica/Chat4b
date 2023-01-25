@@ -62,7 +62,7 @@ let changeUsername = function() {
 }
 
 let changeMail = function() {
-    let mail = document.getElementById("mail").innerText;
+    let mail = document.getElementById("mail").innerHTML;
     let message = {
         "operation": "changeMail",
         "username": getStoredValue("username"),

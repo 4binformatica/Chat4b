@@ -53,6 +53,7 @@ public class Database {
         String sql = "CREATE TABLE IF NOT EXISTS users (\n"
                 + "	username text PRIMARY KEY,\n"
                 + "	password text,\n"
+                + " mail text,\n"
                 + " profilepic text, \n"
                 + " bio text \n"
                 + ");";
@@ -149,24 +150,40 @@ public class Database {
     }
 
     /**
-     * It takes in a username, password, and profile picture, and if the username doesn't already
-     * exist, it adds the user to the database
+     * It creates a table called forgotpassword in the database if it doesn't already exist
+     */
+    public void createForgotPasswordTable(){
+        // SQL statement for creating a new table
+        String sql = "CREATE TABLE IF NOT EXISTS forgotpassword (\n"
+                + "	mail text ,\n"
+                + "	code text \n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            // create a new table
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * It takes 4 strings as parameters and inserts them into the database
      * 
      * @param username String
      * @param password String
-     * @param profilepic String
+     * @param profilepic The path to the profile picture
+     * @param mail String
      * @return A boolean value.
      */
-    public boolean newUser(String username, String password, String profilepic) throws SQLException{
-        if(checkUsername(username)){
-            System.out.println("Username already exists");
-            return false;
-        }
-        String sql = "INSERT INTO users(username, password, profilepic) VALUES(?,?,?)";
+    public boolean newUser(String username, String password, String profilepic, String mail) throws SQLException{
+        String sql = "INSERT INTO users(username, password, profilepic, mail) VALUES(?,?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, username);
         pstmt.setString(2, password);
         pstmt.setString(3, profilepic);
+        pstmt.setString(4, mail);
         pstmt.executeUpdate();
         return true;
     }
@@ -258,6 +275,42 @@ public class Database {
     }
 
     /**
+     * It gets the mail of a user from the database
+     * 
+     * @param username The username of the user you want to get the mail from.
+     * @return The mail of the user.
+     */
+    public String getMail(String username) throws SQLException{
+        String sql = "SELECT mail FROM users WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return rs.getString("mail");
+        }
+        return "";
+    }
+
+    public void changeMail(String username, String mail) throws SQLException{
+        String sql = "UPDATE users SET mail = ? WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    }
+
+    public boolean checkMailExists(String mail) throws SQLException{
+        String sql = "SELECT * FROM users WHERE mail = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * The function takes a username as a parameter and deletes the user from the database
      * 
      * @param username the username of the user to be deleted
@@ -313,6 +366,103 @@ public class Database {
         pstmt.setString(1, newPassword);
         pstmt.setString(2, username);
         pstmt.executeUpdate();
+    }
+
+    /**
+     * It updates the password of a user with the mail address mail to the new password newPassword
+     * 
+     * @param mail the mail of the user
+     * @param newPassword the new password
+     */
+    public void updatePasswordWithMail(String mail, String newPassword) throws SQLException{
+        String sql = "UPDATE users SET password = ? WHERE mail = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, newPassword);
+        pstmt.setString(2, mail);
+        pstmt.executeUpdate();
+    }
+
+    /**
+     * It returns the username of the user with the given mail
+     * 
+     * @param mail the mail of the user
+     * @return The username of the user with the given mail.
+     */
+    public String getUserByMail(String mail) throws SQLException{
+        String sql = "SELECT username FROM users WHERE mail = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return rs.getString("username");
+        }
+        return "";
+    }
+
+    /**
+     * It adds a mail and a code to the forgotpassword table
+     * 
+     * @param mail the email address of the user
+     * @param code the code that is generated by the forgotPassword method
+     */
+    public void addForgotCode(String mail, String code) throws SQLException{
+        String sql = "INSERT INTO forgotpassword(mail, code) VALUES(?,?)";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        pstmt.setString(2, code);
+        pstmt.executeUpdate();
+    }
+
+    /**
+     * It checks if the code exists in the database
+     * 
+     * @param code The code that the user entered
+     * @return A boolean value.
+     */
+    public boolean checkForgotCode(String code) throws SQLException{
+        String sql = "SELECT * FROM forgotpassword WHERE code = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, code);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    public String getMailFromCode(String code) throws SQLException{
+        String sql = "SELECT mail FROM forgotpassword WHERE code = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, code);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return rs.getString("mail");
+        }
+        return "";
+    }
+
+    /**
+     * It deletes the row from the database where the mail is equal to the mail that is passed in as a
+     * parameter
+     * 
+     * @param mail the mail of the user
+     */
+    public void removeForgotCode(String mail) throws SQLException{
+        String sql = "DELETE FROM forgotpassword WHERE mail = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        pstmt.executeUpdate();
+    }
+
+    public boolean checkIfForgotCodeAlreadyExists(String mail) throws SQLException{
+        String sql = "SELECT * FROM forgotpassword WHERE mail = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
     }
 
     /**
