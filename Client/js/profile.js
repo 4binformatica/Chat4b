@@ -4,6 +4,69 @@ socket.onopen = function() {
     document.getElementById("profileName").innerText = getStoredValue("username");
 }
 
+let editMailButton = function() {
+    let saveButton = document.getElementById("saveMail");
+    saveButton.style.display = "inline-block";
+    let editButton = document.getElementById("editMail");
+    editButton.style.display = "none";
+}
+
+let saveMailButton = function() {
+    let saveButton = document.getElementById("saveMail");
+    saveButton.style.display = "none";
+    let editButton = document.getElementById("editMail");
+    editButton.style.display = "inline-block";
+    changeMail();
+}
+
+
+let editBioButton = function() {
+    let maxLength = 200;
+
+    document.getElementById("bioProfile").contentEditable = true;
+    let saveButton = document.getElementById("saveBio");
+    saveButton.style.display = "inline-block";
+    let editButton = document.getElementById("editBio");
+    editButton.style.display = "none";
+
+    let bio = document.getElementById("bioProfile");
+    //focus on the text
+    bio.focus();
+    //make the text selected
+    let selection = window.getSelection();
+    let range = document.createRange();
+    range.selectNodeContents(bio);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    //if enter is pressed
+    bio.addEventListener("keydown", function(e) {
+        if(bio.innerText.length >= maxLength) {
+            //if the text is longer than maxLength, prevent the user from typing
+            if(e.keyCode !== 8 && e.keyCode !== 46) {
+                if(selection.toString().length === 0) {
+                    e.preventDefault();
+                }
+            }
+        }
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            document.getElementById("saveBio").click();
+        }
+    });
+
+
+}
+
+let saveBioButton = function() {  
+    document.getElementById("bioProfile").contentEditable = false;
+    let saveButton = document.getElementById("saveBio");
+    saveButton.style.display = "none";
+    let editButton = document.getElementById("editBio");
+    editButton.style.display = "inline-block";
+    editBio();
+}
+
 /**
  * "getProfilePic" is a function that sends a message to the server to get the profile picture of the
  * user.

@@ -90,7 +90,11 @@ div.small-title {
         overflow-wrap: break-word;
     }
 
-    button.editBio {
+    h4.bio:focus {
+        outline: none;
+    }
+
+    button.editBio, button.saveBio {
         padding: 10px;
         position: relative;
         width: 50px;
@@ -101,3 +105,4 @@ div.small-title {
         cursor: pointer;
         top: 15px;
     }
+

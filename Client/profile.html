@@ -34,12 +34,19 @@
                 <div class="containerBio">
                     <h4 class="bio" id="bioProfile">bioProfile</h4>
                 </div>
-                <button class="editBio" id="editBio">
+                <button class="editBio" id="editBio" onclick="editBioButton()">
                     <i class="fa-solid fa-pen"></i>
                 </button>
+                <button style="display: none;" class="saveBio" id="saveBio" onclick="saveBioButton()">
+                    <i class="fa-solid fa-save"></i>
+                </button>
                 <input id="mail" type="text" placeholder="Your mail..."></input>
-                <button class="editMail" id="editMail" onclick="changeMail()">
+                <button class="editMail" id="editMail" onclick="editMailButton()">
                     <i class="fa-solid fa-pen"></i>
+                </button>
+                <button style="display: none;" class="saveMail" id="saveMail" onclick="saveMailButton()">
+                    <i class="fa-solid fa-save"></i>
+                </button>
             </div>
         </div>
     </div>
