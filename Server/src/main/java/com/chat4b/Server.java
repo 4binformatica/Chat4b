@@ -406,8 +406,8 @@ public class Server extends WebSocketServer {
                     
                 }
                 break;
-            case "getProfilepic":
-                String profilePic = database.getProfilePic(msg.getData());
+            case "getProfilePic":
+                String profilePic = database.getProfilePic(msg.getUsername());
                 sendTo(msg.getConn(), new Message("profilePic", msg.getData(), msg.getUsername(), profilePic));
                 break;
             case "getContacts":

@@ -23,5 +23,6 @@
     "java.configuration.updateBuildConfiguration": "interactive",
     "docwriter.style": "Javadoc",
     "docwriter.progress.trackFunctions": false,
-    "docwriter.progress.trackMethods": false
+    "docwriter.progress.trackMethods": false,
+    "liveServer.settings.port": 5501
 }

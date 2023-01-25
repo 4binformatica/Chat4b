@@ -55,7 +55,7 @@ div.small-title {
     img.profileImage {
         width: 200px;
         height: 200px;
-        border-radius: 20px;
+        border-radius: 50%;
         object-fit: cover;
     }
 

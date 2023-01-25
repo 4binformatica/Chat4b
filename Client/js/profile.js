@@ -4,6 +4,11 @@ socket.onopen = function() {
     document.getElementById("profileName").innerText = getStoredValue("username");
 }
 
+let profilePicClicked = function() {
+    //TODO: add a function to change the profile picture
+    console.log("test");
+}
+
 let editMailButton = function() {
     let saveButton = document.getElementById("saveMail");
     saveButton.style.display = "inline-block";
@@ -152,16 +157,17 @@ let changePassword = function() {
 
 /* A function that is called when the client receives a message from the server. */
 socket.onmessage = function(event) {
+    console.log(event);
     let operation = JSON.parse(event.data).operation;
     let username = JSON.parse(event.data).username;
     let receiver = JSON.parse(event.data).receiver;
     let data = JSON.parse(event.data).data;
 
     switch(operation) {
-        case "getProfilePic":
+        case "profilePic":
             document.getElementById("profilePic").src = data;
             break;
-        case "getBio":
+        case "bio":
             document.getElementById("bioProfile").innerText = data;
             break;
         default:
