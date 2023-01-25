@@ -7,7 +7,14 @@ socket.onopen = function (event) {
     setInterval(keepAlive, 10000);
     getContacts();
     isLogged();
+    document.getElementById("message-input").value = "";
 };
+
+$(document).keyup(function(event) {
+    if ($(".chat-input").is(":focus") && event.key == "Enter") {
+        sendMessage();
+    }
+});
 
 /**
  * It takes the value of the message-input element, and sends it to the server.
@@ -325,11 +332,12 @@ socket.addEventListener('message', (event) => {
             reloadMessages();
             break;
         case "image":
+            var imagediv = document.createElement('div');
             var image = document.createElement('img');
             if(username == getStoredValue("username")){
-                image.className = "image-sent";
+                imagediv.className = "image-sent";
             }else{
-                image.className = "image-received";
+                imagediv.className = "image-received";
             }
             image.src =  data;
             image.width = 200;
@@ -349,7 +357,8 @@ socket.addEventListener('message', (event) => {
                     reloadMessages();
                 }
             }
-            document.getElementById("messageList").appendChild(image);
+            imagediv.appendChild(image);
+            document.getElementById("messageList").appendChild(imagediv);
             //scroll to bottom
             document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
             break;
@@ -421,6 +430,8 @@ socket.addEventListener('message', (event) => {
                 window.location.pathname = 'Client/index.html';
             }
         case "draft":
+            if(draft == null)
+                return;
             if(receiver == getSelectedContactName()){
                 document.getElementById("message-input").value = data;
             }

@@ -8,7 +8,7 @@ import org.java_websocket.server.WebSocketServer;
 
 public class App {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		String host = "10.1.1.100";
+		String host = "192.168.43.226";
 		int port = 8887;
 
 		WebSocketServer server = new Server(new InetSocketAddress(host, port));

@@ -2,8 +2,6 @@ package com.cliclient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.WebSocket;
-import java.util.Scanner;
 
 /**
  * Hello world!

@@ -1,0 +1,103 @@
+:root {
+    --red-crayola: #ed254eff;
+    --naples-yellow: #f9dc5cff;
+    --mint-cream: #f4fffdff;
+    --oxford-blue: #011936ff;
+    --black-coral: hsl(212, 17%, 33%);
+    --sfondo: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(255,0,49,1) 100%);
+    --font: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--sfondo);
+    overflow-x: hidden;
+}
+
+h4.small-title {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--mint-cream);
+    font-size: 2vw;
+}
+
+div.small-title {
+    /* border: 3px solid green;  */
+    position: relative;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    bottom: 15px;
+}
+
+.containerProfile {
+    padding-left: 20%;
+}
+
+.containerSmallProfile {
+    width: 600px;
+    height: 400px;
+    display: flex;
+    width: 70%;
+    height: 450px;
+    border: 10px solid #011936;
+    background-color: #fff;
+    color: #fff;
+    border-radius: 20px;
+    padding: 10px;
+    display: flex;
+  }
+
+  .containerProfileImage {
+    width: 200px;
+    height: 200px;
+  }
+
+
+    img.profileImage {
+        width: 200px;
+        height: 200px;
+        border-radius: 20px;
+        object-fit: cover;
+    }
+
+    .containerName {
+        width: auto;
+    }
+
+    h4.profileName {
+        font-family: var(--font);
+        color: var(--oxford-blue);
+        font-size: 35px;
+        text-align: center;
+    }
+
+    .textBoxBio {
+        padding-left: 100px;
+    }
+
+    .containerBio {
+        border: 5px solid var(--oxford-blue);
+        border-radius: 20px;
+        width: 300px;
+        height: 200px;
+        padding: 5px;
+    }
+
+    h4.bio {
+        font-family: var(--font);
+        color: var(--oxford-blue);
+        font-size: 20px;
+        justify-content: center;
+        overflow-wrap: break-word;
+    }
+
+    button.editBio {
+        padding: 10px;
+        position: relative;
+        width: 50px;
+        border-radius: 10px;
+        background-color: #011936;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        top: 15px;
+    }

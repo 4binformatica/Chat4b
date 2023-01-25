@@ -407,6 +407,13 @@ public class Server extends WebSocketServer {
             case "saveDraft":
                 database.createDraft(msg.getUsername(), msg.getData(), msg.getReceiver());
                 break;
+            case "getBio":
+                String bio = database.getBio(msg.getData());
+                sendTo(msg.getConn(), new Message("bio", msg.getUsername(), msg.getUsername(), bio));
+                break;
+            case "changeBio":
+                database.changeBio(msg.getUsername(), msg.getData());
+                break;
             case "ping":
                 String t1 = msg.getDate();
                 String t2 = Instant.now().toString();
@@ -415,6 +422,7 @@ public class Server extends WebSocketServer {
                 break;
             case "keepAlive":
                 break;
+            
             default:
                 System.out.println("Unknown operation: " + msg.getOperation());
                 break;

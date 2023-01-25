@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 public class Database {
 
     String url = "jdbc:sqlite:database.db";
@@ -47,14 +46,15 @@ public class Database {
     }
 
     /**
-     * It creates a table called users with three columns: username, password, and profilepic
+     * This function creates a table called users in the database if it doesn't already exist
      */
     public void createUserTable() {
         // SQL statement for creating a new table
         String sql = "CREATE TABLE IF NOT EXISTS users (\n"
                 + "	username text PRIMARY KEY,\n"
                 + "	password text,\n"
-                + " profilepic text \n"
+                + " profilepic text, \n"
+                + " bio text \n"
                 + ");";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -224,6 +224,37 @@ public class Database {
             return true;
         }
         return false;
+    }
+
+    /**
+     * It updates the bio of the user with the username passed in
+     * 
+     * @param username The username of the user who's bio you want to change.
+     * @param bio the new bio
+     */
+    public void changeBio(String username, String bio) throws SQLException{
+        String sql = "UPDATE users SET bio = ? WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, bio);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    }
+
+    /**
+     * It takes a username as a parameter, and returns the bio of the user with that username
+     * 
+     * @param username The username of the user you want to get the bio of.
+     * @return The bio of the user.
+     */
+    public String getBio(String username) throws SQLException{
+        String sql = "SELECT bio FROM users WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return rs.getString("bio");
+        }
+        return "";
     }
 
     /**

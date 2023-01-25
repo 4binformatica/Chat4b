@@ -1,7 +1,6 @@
 package com.cliclient;
 
 import java.net.URI;
-import java.net.http.WebSocket;
 import java.time.Instant;
 import java.util.Scanner;
 

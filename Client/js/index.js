@@ -1,3 +1,6 @@
+socket.onopen = function() {
+    isLogged();
+}
 
 /**
  * It takes the username and password from the login form, creates a JSON object, and sends it to the
@@ -14,6 +17,20 @@ let login = function() {
         "date": new Date().toISOString()
     }
     sendToServer(JSON.stringify(message));
+}
+
+let isLogged = () => {
+    let username = getStoredValue("username");
+    let loginID = getStoredValue("loginID");
+    let message = {
+        "operation": "checkLoginID",
+        "username": username,
+        "receiver": "server",
+        "data": loginID,
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+
 }
 
 
@@ -42,6 +59,12 @@ socket.onmessage = function(event) {
                 alert("Login failed");
             }
             break;
+        case "checkLoginID":
+            if(data == "true"){
+                window.location.pathname = 'Client/chat.html';
+            }else{
+                window.location.pathname = 'Client/index.html';
+            }
         default:
             console.log(data);
             

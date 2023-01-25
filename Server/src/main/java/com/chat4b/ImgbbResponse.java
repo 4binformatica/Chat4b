@@ -1,14 +1,12 @@
 package com.chat4b;
 
-import com.google.gson.Gson;
-
 /**
  * ImgbbResponse
  */
 public class ImgbbResponse {
     Data data;
-    private String success;
-    private String status;
+    //private String success;
+    //private String status;
 
     public String getUrl() {
         if (data != null) {

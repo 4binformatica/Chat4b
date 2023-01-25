@@ -90,11 +90,13 @@ div.small-title {
   .chat-container {
     width: 95%;
     height: 400px;
-    background-color: #011936;
+    background-color: #01193600;
+    backdrop-filter: blur(10px);
     color: #fff;
     border-radius: 20px;
     padding: 10px;
     display: flex;
+    box-shadow:hsl(212, 17%, 33%) 0px 0px 10px 0px;
   }
   
   .sidebar {
@@ -149,10 +151,12 @@ div.small-title {
   .main-content {
     flex: 1;
     margin-left: 10px;
-    background-color: #fff;
+    background-color: #ffffff99; 
+    backdrop-filter: blur(10px);
     color: #011936;
     border-radius: 10px;
     padding: 10px;
+    backdrop-filter: blur(10px);
   }
   
   .chat-header {
@@ -170,7 +174,8 @@ div.small-title {
   }
 
   div.message-container.sent {
-    text-align: right; !important;
+    text-align: right !important;
+    overflow-wrap: break-word !important;
   }
   
   .message-container {
@@ -311,7 +316,9 @@ div.small-title {
     border-radius: 50%;
   }
 
-  
+  div.image-sent {
+    text-align: right;
+  }
 
   
 
