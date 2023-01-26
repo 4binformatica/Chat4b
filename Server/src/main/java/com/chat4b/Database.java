@@ -454,6 +454,12 @@ public class Database {
         pstmt.executeUpdate();
     }
 
+    /**
+     * It checks if the mail exists in the database
+     * 
+     * @param mail the email address of the user
+     * @return A boolean value.
+     */
     public boolean checkIfForgotCodeAlreadyExists(String mail) throws SQLException{
         String sql = "SELECT * FROM forgotpassword WHERE mail = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -464,6 +470,27 @@ public class Database {
         }
         return false;
     }
+
+    /**
+     * It checks if the code is for the mail
+     * 
+     * @param mail The mail of the user
+     * @param code The code that the user has entered
+     * @return A boolean value.
+     */
+    public boolean checkIfCodeIsForMail(String mail, String code) throws SQLException{
+        String sql = "SELECT * FROM forgotpassword WHERE mail = ? AND code = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, mail);
+        pstmt.setString(2, code);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+
 
     /**
      * It adds a message to the database

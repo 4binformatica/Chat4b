@@ -21,8 +21,9 @@
     <div class="containerProfile">
         <div class="containerSmallProfile">
             <div class="containerProfileIMGName">
-                <div class="containerProfileImage">
-                    <img onclick="profilePicClicked()" id="profilePic" src="https://i.ibb.co/NsJGFh6/istockphoto-522855255-612x612-modified.png" alt="profile" class="profileImage">
+                <div id="profileImage" class="containerProfileImage">
+                    <input type="file" style="display: none;" id="changeProfilePic-input" accept="image/*" onchange="profilePicClicked()">
+                    <img onClick="document.getElementById('changeProfilePic-input').click()" id="profilePic" src="https://i.ibb.co/NsJGFh6/istockphoto-522855255-612x612-modified.png" alt="profile" class="profileImage">
                 </div>  
                 <div class="containerName">
                     <div class="containerProfileName">

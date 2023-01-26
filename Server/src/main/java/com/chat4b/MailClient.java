@@ -12,7 +12,6 @@ public class MailClient {
 
    // Creating a new session with the given properties.
     public MailClient(String host, int port, boolean starttls, boolean auth, String user, String pass) {
-
         this.username = user;
         this.password = pass;
         Properties props = new Properties();

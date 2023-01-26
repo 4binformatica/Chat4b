@@ -27,7 +27,7 @@ let changePassword = () => {
     message = {
         "operation": "changeForgotPassword",
         "username": document.getElementById("mail").value,
-        "receiver": "server",
+        "receiver": document.getElementById("code").value,
         "data": document.getElementById("password1").value,
         "date": new Date().toISOString()
     }

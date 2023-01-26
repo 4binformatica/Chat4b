@@ -2,6 +2,12 @@ socket.onopen = function() {
     isLogged();
 }
 
+//run isLofged() when the page is loaded after 1 second
+window.onload = function() {
+    setTimeout(isLogged, 1000);
+}
+
+
 /**
  * It takes the username and password from the login form, creates a JSON object, and sends it to the
  * server.
@@ -22,6 +28,7 @@ let login = function() {
 let isLogged = () => {
     let username = getStoredValue("username");
     let loginID = getStoredValue("loginID");
+    console.log("Username: " + username + " LoginID: " + loginID)
     let message = {
         "operation": "checkLoginID",
         "username": username,
@@ -63,7 +70,8 @@ socket.onmessage = function(event) {
             if(data == "true"){
                 window.location.pathname = 'Client/chat.html';
             }else{
-                window.location.pathname = 'Client/index.html';
+                if(!window.location.pathname == 'Client/index.html')
+                    window.location.pathname = 'Client/index.html';
             }
         default:
             console.log(data);

@@ -1,1 +1,1 @@
-let socket = new WebSocket("ws://localhost:8887/");
+let socket = new WebSocket("ws://87.4.163.109:8887/");

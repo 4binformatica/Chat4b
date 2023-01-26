@@ -49,7 +49,7 @@ public class Server extends WebSocketServer {
 
 	public Server(InetSocketAddress address, Config config) throws ClassNotFoundException, SQLException {
 		super(address);
-        mailClient = new MailClient(config.getHost(), config.getPort(), config.isMailAuth(), config.isMailStarttls(), config.getMailUser(), config.getMailPassword());
+        mailClient = new MailClient(config.getMailHost(), config.getMailPort(), config.isMailAuth(), config.isMailStarttls(), config.getMailUser(), config.getMailPassword());
         this.config = config;
         checkDatabase();
         database.databaseConnect();
@@ -286,6 +286,10 @@ public class Server extends WebSocketServer {
         for(int i = 0; i < 10; i++){
             loginID += username.charAt((int)(Math.random() * username.length()));
         }
+        //another randomizer
+        if(Math.random() > 0.5){
+            loginID += (int)(Math.random() * 10);
+        }
         //check if the loginID is already in the database
         if(database.checkLoginID(loginID)){
             //if it is, generate a new one
@@ -431,6 +435,9 @@ public class Server extends WebSocketServer {
                 break;
             case "getDraft":
                 String draft = database.getDraft(msg.getUsername(), msg.getReceiver());
+                if(draft == null){
+                    draft = "";
+                }
                 sendTo(msg.getConn(), new Message("draft", msg.getUsername(), msg.getReceiver(), draft));
                 break;
             case "saveDraft":
@@ -438,6 +445,9 @@ public class Server extends WebSocketServer {
                 break;
             case "getBio":
                 String bio = database.getBio(msg.getData());
+                if(bio == null){
+                    bio = "";
+                }
                 sendTo(msg.getConn(), new Message("bio", msg.getUsername(), msg.getUsername(), bio));
                 break;
             case "changeBio":
@@ -456,8 +466,8 @@ public class Server extends WebSocketServer {
                     }
                     String forgotCode = generateForgotCode(msg.getData());
                     database.addForgotCode(msg.getData(), forgotCode);
-                    mailClient.sendMail("no-reply@kapindustries.it", msg.getData(), "Forgot password", recoveryMail(forgotCode));
                     sendTo(msg.getConn(), new Message("forgotPassword", msg.getUsername(), msg.getUsername(), "success"));
+                    mailClient.sendMail("no-reply@kapindustries.it", msg.getData(), "Forgot password", recoveryMail(forgotCode));
                 }else{
                     sendTo(msg.getConn(), new Message("forgetPassword", msg.getUsername(), msg.getUsername(), "Mail does not exist"));
                 }
@@ -474,6 +484,11 @@ public class Server extends WebSocketServer {
                 
                 System.out.println("Changing password for " + msg.getUsername() + " to " + msg.getData());
                 String mail = msg.getUsername();
+                String code = msg.getReceiver();
+                if(!database.checkIfCodeIsForMail(mail, code)){
+                    sendTo(msg.getConn(), new Message("changeForgotPassword", msg.getUsername(), msg.getUsername(), "Wrong code"));
+                    return;
+                }
                 database.updatePasswordWithMail(mail, msg.getData());
                 database.removeForgotCode(msg.getUsername());
                 sendTo(msg.getConn(), new Message("changeForgotPassword", msg.getUsername(), msg.getUsername(), "success"));

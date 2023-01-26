@@ -5,8 +5,21 @@ socket.onopen = function() {
 }
 
 let profilePicClicked = function() {
-    //TODO: add a function to change the profile picture
-    console.log("test");
+    let file = document.getElementById("changeProfilePic-input").files[0];
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+        let base64Img = reader.result.split(',')[1];
+        let message = {
+            "operation": "changeProfilePic",
+            "username": getStoredValue("username"),
+            "receiver": "server",
+            "data": base64Img,
+            "date": new Date().toISOString()
+        }
+        sendToServer(JSON.stringify(message));
+        reloadProfilePic();
+    }
 }
 
 let editMailButton = function() {
@@ -61,6 +74,10 @@ let editBioButton = function() {
     });
 
 
+}
+
+let reloadProfilePic = function() {
+    getProfilePic();
 }
 
 let saveBioButton = function() {  

@@ -42,7 +42,11 @@ socket.addEventListener('message', (event) => {
                 alert(data);
             }
             break;
-            default:
-                console.log(data);
+        case "loginID":
+            deleteStoredValue("loginID");
+            storeValue("loginID", data);
+            break;
+        default:
+            console.log(data);
     }
 })

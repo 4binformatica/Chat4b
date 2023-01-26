@@ -10,6 +10,7 @@ socket.onopen = function (event) {
     document.getElementById("message-input").value = "";
 };
 
+
 $(document).keyup(function(event) {
     if ($(".chat-input").is(":focus") && event.key == "Enter") {
         sendMessage();
@@ -425,7 +426,8 @@ socket.addEventListener('message', (event) => {
             break;
         case "checkLoginID":
             if(data == "true"){
-                window.location.pathname = 'Client/chat.html';
+                if(!window.location.pathname == '/Client/index.html')
+                    window.location.pathname = 'Client/chat.html';
             }else{
                 window.location.pathname = 'Client/index.html';
             }
