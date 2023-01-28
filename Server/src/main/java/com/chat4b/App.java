@@ -2,6 +2,7 @@ package com.chat4b;
 
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
+import java.util.Map;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,13 +15,13 @@ import com.google.gson.Gson;
 
 
 public class App {
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		String host = "localhost";
-		int port = 8887;
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
 		createConfigFile();
+		int port = 8080;
 		Config config = loadConfig();
 		System.out.println("Starting server on " + config.getHost() + ":" + config.getPort());
 		WebSocketServer server = new Server(new InetSocketAddress(config.getHost(), config.getPort()), config);
+		WebServer webServer = new WebServer(config);
 		server.run();
 	}
 

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pannello Amministrativo</title>
+    <link rel="stylesheet" type="text/css" href="css/admin.css">
+    <script src="js/connection.js"></script>
+    <script src="js/cookie.js"></script>
+    <script src="js/instruction.js"></script>
+    <script src="js/admin.js"></script>
+  </head>
+  <body>
+    <h1>Pannello Amministrativo</h1>
+    <input type="text" id="adminCode" placeholder="Codice Amministratore">
+    <button id="adminCodeButton" onclick="sendAdminCode()">Accedi</button>
+    <table id="userTable">
+    </table>
+    <button id="deleteAllButton" onclick="deleteAllUser()">Elimina tutti gli utenti</button>
+    <button id="deleteAllMessagesButton" onclick="deleteAllMessages()">Elimina tutti i messaggi</button>
+    <button id="logoutButton" onclick="logout()">Logout</button>
+    <button id="refreshButton" onclick="refresh()">Refresh</button>
+  </body>
+</html>

@@ -224,6 +224,37 @@ let sendMessage = async () => {
 }
 
 /**
+ * It sends a message to the server asking for the bio of the selected contact.
+ */
+let getContactBio = () => {
+    console.log("getContactBio");
+    let message = {
+        "operation": "getBio",
+        "username": getStoredValue("username"),
+        "receiver": "server",
+        "data": getSelectedContactName(),
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+/**
+ * It sends a message to the server asking for the profile picture of the selected contact.
+ */
+let getContactPic = () => {
+    let message = {
+        "operation": "getProfilePic",
+        "username": getSelectedContactName(),
+        "receiver": "server",
+        "data": getSelectedContactName(),
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+
+
+/**
  * It clears the message list and then reloads it with the messages from the selected contact.
  */
 let reloadMessages = () => {
@@ -245,6 +276,7 @@ let logout = () => {
     }
     sendToServer(JSON.stringify(message));
     deleteStoredValue("username");
+    deleteStoredValue("loginID");
     window.location.pathname = 'Client/index.html';
 }
 
@@ -413,6 +445,8 @@ socket.addEventListener('message', (event) => {
                 reloadContacts();
                 return;
                 }
+                getContactPic();
+                getContactBio();
                 message = {
                     "operation": "getDraft",
                     "username": getStoredValue("username"),
@@ -437,6 +471,20 @@ socket.addEventListener('message', (event) => {
             if(receiver == getSelectedContactName()){
                 document.getElementById("message-input").value = data;
             }
+            break;
+        case "profilePic":
+            var image = document.createElement('img');
+            image.src =  data;
+            image.width = 100;
+            image.height = 100;
+            image.className = "contact-image";
+            document.getElementById("contactInfo").appendChild(image);
+            break;
+        case "bio":
+            var bio = document.createElement('div');
+            bio.className = "contact-bio";
+            bio.innerText = data;
+            document.getElementById("contactInfo").appendChild(bio);
             break;
         default:
             console.log(data);

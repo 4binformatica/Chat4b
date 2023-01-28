@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import java.util.Map;
 
 import com.google.gson.Gson;
 
@@ -23,6 +24,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+
 
 
 
@@ -59,6 +61,7 @@ public class Server extends WebSocketServer {
         database.createLoginIDTable();
         database.createDraftTable();
         database.createForgotPasswordTable();
+        database.createAdminCodeTable();
 	}
 
     /**
@@ -142,6 +145,7 @@ public class Server extends WebSocketServer {
      * @param conn The WebSocket connection that has been closed.
      * @param ex The exception that occurred.
      */
+    @Override
     public void onError(WebSocket conn, Exception ex) {
 		System.err.println("an error occurred on connection " + conn.getRemoteSocketAddress()  + ":" + ex);
 	}
@@ -310,6 +314,17 @@ public class Server extends WebSocketServer {
         String code = "";
         for(int i = 0; i < 10; i++){
             code += mail.charAt((int)(Math.random() * mail.length()));
+        }
+        return code;
+    }
+
+    public String generateAdminCode(String username){
+        String code = "";
+        for(int i = 0; i < 30; i++){
+            code += username.charAt((int)(Math.random() * username.length()));
+        }
+        if(Math.random() > 0.5){
+            code += (int)(Math.random() * 10);
         }
         return code;
     }
@@ -501,6 +516,55 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("changeMail", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
+            case "isAdministrator":
+                if(database.isAdministator(msg.getUsername())){
+                    String adminCode = generateAdminCode(msg.getUsername());
+                    database.addAdminCode(msg.getUsername(), adminCode);
+
+                    sendTo(msg.getConn(), new Message("isAdministrator", msg.getUsername(), msg.getUsername(), "true"));
+                    mailClient.sendMail("no-reply@kapindustries.it", database.getMail(msg.getUsername()), "Admin Code", "Hi " + msg.getUsername() + ", your admin code is " + adminCode + ". Please do not share it with anyone." + "\n If you did not request this code, contact Administrator immediately. \n This code will expire in 5 minutes.");
+                }else{
+                    sendTo(msg.getConn(), new Message("isAdministrator", msg.getUsername(), msg.getUsername(), "false"));
+                }
+                break;
+            case "verifyAdminCode":
+                if(database.verifyAdminCode(msg.getUsername(), msg.getData())){
+                    sendTo(msg.getConn(), new Message("verifyAdminCode", msg.getUsername(), msg.getUsername(), "true"));
+                }else{
+                    sendTo(msg.getConn(), new Message("verifyAdminCode", msg.getUsername(), msg.getUsername(), "false"));
+                }
+                break;
+            case "getAllUsers":
+                if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
+                    System.out.println("User " + msg.getUsername() + " tried to get all users without admin rights");
+                    return;
+                }
+
+                System.out.println("User " + msg.getUsername() + " got all users");
+                ArrayList<String> users = database.getAllUsers();
+                for(String user : users){
+                    sendTo(msg.getConn(), new Message("getAllUsers", user, database.getMail(user), database.getProfilePic(user)));
+                }
+                break;
+            case "deleteUser":
+                if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
+                database.removeUser(msg.getData());
+                break;
+            case "deleteAllUsers":
+                if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
+                database.removeAllUsers();
+                break;
+            case "deleteAllMessages":
+                if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
+                database.removeAllMessages();
+                break;
+            
             case "keepAlive":
                 break;
             default:

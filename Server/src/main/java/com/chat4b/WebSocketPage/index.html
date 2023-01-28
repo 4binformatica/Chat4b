@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Chat4b - Server</title>
+</head>
+<style type="text/css">
+  body {
+    font-family: 'Consolas', sans-serif;
+    color: white;
+    background: blue;
+    font-size: large;
+  }
+  
+  h3,p {
+    margin: 0px;
+  }
+  
+  .console::before {
+    content: '>'
+  }
+  
+  .denied {
+    position: absolute;
+    right: 50%;
+    top: 25%;
+  }
+
+  .nedry-body {
+    position: relative;
+    top: 0;
+    left: 0;
+  }
+  
+  .nedry-head {
+    position: absolute;
+    top: 35px;
+    left: 140px;
+  }
+  
+  .nedry-hand{
+    position: absolute;
+    top: 155px;
+    left: 265px;
+    animation: handFrames linear 1s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 100%;
+    -webkit-animation: handFrames linear 0.7s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 50% 100%;
+  }
+  
+  @keyframes handFrames{
+    0% {
+      transform:  rotate(-10deg) ;
+    }
+    50% {
+      transform:  rotate(14deg) ;
+    }
+    100% {
+      transform:  rotate(-10deg) ;
+    }
+  }
+</style>
+<body onclick="playSound()">
+<!-- partial:index.partial.html -->
+<h3>Chat4b, System Interface</h3>
+<h3>Version 4.0.5, Alpha E</h3>
+<h3>Ready...</h3>
+<input hidden id="unmuteButton" type="button" onclick="playSound()" value="🔈 Unmute" />
+<h3 id="element"></h3>
+<div hidden class="denied">
+    <img class="nedry-body" src="http://87.4.163.109:5500/Client/assets/WebSocketPage/resources/body.png">
+    <img class="nedry-head" src="http://87.4.163.109:5500/Client/assets/WebSocketPage/resources/head.png">
+    <img class="nedry-hand" src="http://87.4.163.109:5500/Client/assets/WebSocketPage/resources/hand.png">
+  </div>
+  <audio id="player" autoplay loop>
+    <source src="http://87.4.163.109:5500/Client/assets/WebSocketPage/resources/ahahah.mp3" type="audio/mp3">
+  </audio>
+<!-- partial -->
+</body>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/typeit/5.0.2/typeit.min.js'></script>
+<script type="text/javascript">
+  var type = new TypeIt('#element', { cursor: false});
+  let soundBool = false;
+addCommand(type,400, 55,`<p class='console'> access main program</p>`);
+addCommand(type,1300,65,`<p class='console'> access main security</p>`);
+addCommand(type,1000,45,`<p class='console'> access security</p>`);
+addCommand(type,1000,45,`<p class='console'> access main security grid</p>`, true);
+
+magicWord(type);
+
+setTimeout(() => {document.getElementsByClassName("denied")[0].removeAttribute("hidden"); document.getElementById("unmuteButton").removeAttribute("hidden"); soundBool=true;},12000);
+
+
+
+function addCommand(type, pause, speed, command, last) {
+  const basicResponse = 'access: PERMISSION DENIED.';
+  let response = last ? basicResponse + '....and....' : basicResponse;
+  type.pause(pause)
+      .options({speed: speed})
+      .type(command)
+      .pause(200)
+      .options({speed: 0})
+      .type(response)
+      .break();
+}
+
+function magicWord(type) {
+  type.pause(1500);
+  for (var index=0;index<40;index++) {
+    type.pause(4)
+      .options({speed: 0})
+      .type(`YOU DIDN'T SAY THE MAGIC WORD!`)
+      .break();
+  }
+}
+
+const sound = document.getElementById('player');
+
+sound.addEventListener('play', (event) => {
+    document.getElementById("unmuteButton").hidden = true;
+});
+
+sound.addEventListener('pause', (event) => {
+    document.getElementById("unmuteButton").hidden = false;
+});
+
+function playSound() {
+    if(soundBool)
+      document.getElementById("player").play();
+  }
+</script>
+</html>

@@ -45,6 +45,7 @@ socket.addEventListener('message', (event) => {
         case "loginID":
             deleteStoredValue("loginID");
             storeValue("loginID", data);
+            storeValue(document.getElementById("username1").value, username);
             break;
         default:
             console.log(data);

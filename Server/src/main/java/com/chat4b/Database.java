@@ -5,11 +5,13 @@ package com.chat4b;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -55,7 +57,8 @@ public class Database {
                 + "	password text,\n"
                 + " mail text,\n"
                 + " profilepic text, \n"
-                + " bio text \n"
+                + " bio text, \n"
+                + " admin text \n"
                 + ");";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -168,6 +171,23 @@ public class Database {
         }
     }
 
+    public void createAdminCodeTable(){
+        // SQL statement for creating a new table
+        String sql = "CREATE TABLE IF NOT EXISTS admincode (\n"
+                + " username text ,\n"
+                + "	code text, \n"
+                + " date text \n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            // create a new table
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     /**
      * It takes 4 strings as parameters and inserts them into the database
      * 
@@ -238,6 +258,43 @@ public class Database {
         pstmt.setString(1, username);
         ResultSet rs = pstmt.executeQuery();
         if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * It checks if the user is an administrator
+     * 
+     * @param username The username of the user you want to check.
+     * @return A boolean value.
+     */
+    public boolean isAdministator(String username) throws SQLException{
+        String sql = "SELECT * FROM users WHERE username = ? AND admin = 1";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean verifyAdminCode(String username, String code) throws SQLException{
+        String sql = "SELECT * FROM admincode WHERE username = ? AND code = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, code);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            //check if the code is outdated 5 minutes
+            String date = rs.getString("date");
+            Instant instant = Instant.parse(date);
+            Instant now = Instant.now();
+            Duration duration = Duration.between(instant, now);
+            if(duration.toMinutes() > 5){
+                return false;
+            }
             return true;
         }
         return false;
@@ -321,6 +378,78 @@ public class Database {
         pstmt.setString(1, username);
         pstmt.executeUpdate();
     }
+
+    /**
+     * It returns an ArrayList of all the usernames in the database
+     * 
+     * @return An ArrayList of Strings
+     */
+    public ArrayList <String> getAllUsers() throws SQLException{
+        ArrayList <String> users = new ArrayList <String>();
+        String sql = "SELECT username FROM users";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        while(rs.next()){
+            users.add(rs.getString("username"));
+        }
+        return users;
+    }
+
+    /**
+     * It adds a code to the database
+     * 
+     * @param username String
+     * @param code the code that the user will enter to become an admin
+     */
+    public void addAdminCode(String username, String code) throws SQLException{
+        if(checkIfUserAlreadyHaveAdminCode(username)){
+            removeAdminCode(username);
+        }
+        String sql = "INSERT INTO admincode(username, code) VALUES(?, ?, ?)";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, code);
+        pstmt.setString(3, Instant.now().toString());
+        pstmt.executeUpdate();
+    }
+
+    public void removeAdminCode(String username) throws SQLException{
+        String sql = "DELETE FROM admincode WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.executeUpdate();
+    }
+
+    public boolean checkIfUserAlreadyHaveAdminCode(String username) throws SQLException{
+        String sql = "SELECT * FROM admincode WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This function deletes all the rows in the users table
+     */
+    public void removeAllUsers() throws SQLException{
+        String sql = "DELETE FROM users";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.executeUpdate();
+    }
+
+    /**
+     * This function deletes all the messages from the database
+     */
+    public void removeAllMessages() throws SQLException{
+        String sql = "DELETE FROM messages";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.executeUpdate();
+    }
+
+
 
     /**
      * It updates the username of a user in the database
@@ -740,6 +869,9 @@ public class Database {
      * @param contact the contact to be added
      */
     public void addContact(String username, String contact) throws SQLException{
+        if(contact == null || contact.equals("")){
+            return;
+        }
         String sql = "INSERT INTO contacts(username, contact) VALUES(?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, username);
