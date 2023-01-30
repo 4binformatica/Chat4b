@@ -1,3 +1,9 @@
+let firstClick = false;
+let firstClick2 = false;
+let mail = "";
+let code = "";
+let username = "";
+
 socket.onopen = function() {
     isLogged();
 }
@@ -5,6 +11,11 @@ socket.onopen = function() {
 //run isLofged() when the page is loaded after 1 second
 window.onload = function() {
     setTimeout(isLogged, 1000);
+    createInput("text", "username", "Your username...", "user", "input_cont");
+    createInput("password", "password", "Your password...", "pass", "input_cont");
+    createButton("login_button", "Login", login, "btn btn-white btn-animation", "button_cont");
+    createButton("register_button", "Register", register, "btn btn-white btn-animation", "button_cont");
+    createButton("password_reset_button", "Password reset", passwordReset, "btn btn-white btn-animation", "button_cont");
 }
 
 
@@ -13,13 +24,118 @@ window.onload = function() {
  * server.
  */
 let login = function() {
-    let username = document.getElementById("username").value;
+    username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
     let message = {
         "operation": "login",
         "username": username,
         "receiver": "Server",
         "data": password,
+        "date": new Date().toISOString()
+    }
+    deleteStoredValue("username")
+    storeValue("username", username);
+    sendToServer(JSON.stringify(message));
+    
+}
+
+let register = function() {
+    if(firstClick == false){
+        document.getElementById("username").remove();
+        document.getElementById("password").remove();
+        document.getElementById("login_button").remove();
+        document.getElementById("register_button").remove();
+        document.getElementById("password_reset_button").remove();
+        createInput("text", "username", "Your username...", "user", "input_cont");
+        createInput("text", "mail", "Your mail...", "user", "input_cont");
+        createInput("password", "password", "Your password...", "pass", "input_cont");
+        createInput("password", "passwordverify", "Verify your password...", "pass", "input_cont");
+        createButton("register_button", "Register", register, "btn btn-white btn-animation", "button_cont");
+        firstClick = true;
+        return;
+    }
+    username = document.getElementById("username").value;
+    let mail = document.getElementById("mail").value;
+    let password = document.getElementById("password").value;
+    let passwordverify = document.getElementById("passwordverify").value;
+    if(!mail.includes("@") || !mail.includes(".")){
+        alert("Please enter a valid mail address");
+        return;
+    }
+    if(password != passwordverify){
+        alert("The passwords do not match");
+        return;
+    }
+    let message = {
+        "operation": "register",
+        "username": username,
+        "receiver": mail,
+        "data": password,
+        "date": new Date().toISOString()   
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+let passwordReset = function() {
+    if(firstClick2 == false){
+        document.getElementById("username").remove();
+        document.getElementById("password").remove();
+        document.getElementById("login_button").remove();
+        document.getElementById("register_button").remove();
+        document.getElementById("password_reset_button").remove();
+        createInput("text", "mail", "Your mail...", "user", "input_cont");
+        createButton("mail_check_button", "Check mail", checkMail, "btn btn-white btn-animation", "button_cont");
+        firstClick2 = true;
+        return;
+    }
+    let mail = document.getElementById("mail").value;
+}
+
+let checkMail = () => {
+    message = {
+        "operation": "forgotPassword",
+        "username": document.getElementById("mail").value,
+        "receiver": "server",
+        "data": document.getElementById("mail").value,
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+    alert("Check your mail for the code");
+}
+
+let checkCode = () => {
+    message = {
+        "operation": "checkForgotCode",
+        "username": mail,
+        "receiver": "server",
+        "data": document.getElementById("code").value,
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+let changePassword = () => {
+    //check if the passwords match
+    if(document.getElementById("password").value != document.getElementById("passwordverify").value){
+        alert("The passwords do not match");
+        return;
+    }
+    message = {
+        "operation": "changeForgotPassword",
+        "username": mail,
+        "receiver": code,
+        "data": document.getElementById("password").value,
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+let checkVerificationCode = () => {
+    message = {
+        "operation": "checkVerificationCode",
+        "username": getStoredValue("username"),
+        "receiver": "server",
+        "data": document.getElementById("code").value,
         "date": new Date().toISOString()
     }
     sendToServer(JSON.stringify(message));
@@ -40,6 +156,28 @@ let isLogged = () => {
 
 }
 
+let createInput = (type, id, placeholder, className, parent) => {
+    let input = document.createElement("input");
+    input.type = type;
+    input.id = id;
+    input.placeholder = placeholder;
+    input.className = className;
+    document.getElementById(parent).appendChild(input);
+    return input;
+}
+
+let createButton = (id, text, onclick, className, parent) => {
+    console.log("Creating button");
+    let button = document.createElement("a");
+    button.id = id;
+    button.innerHTML = text;
+    button.onclick = onclick;
+    button.className = className;
+    button.href = "#";
+    document.getElementById(parent).appendChild(button);
+    return button;
+}
+
 
 socket.onopen = function() {
     console.log("Connection established!");
@@ -56,11 +194,30 @@ socket.onmessage = function(event) {
         case "loginID":
             deleteStoredValue("loginID");
             storeValue("loginID", data);
+            deleteStoredValue("username");
+            storeValue(document.getElementById("username").value, username);
+            break;
+        case "needVerification":
+            document.getElementById("username").remove();
+            document.getElementById("password").remove();
+            document.getElementById("login_button").remove();
+            document.getElementById("register_button").remove();
+            document.getElementById("password_reset_button").remove();
+            createInput("text", "code", "Verification code...", "user", "input_cont");
+            createButton("code_check_button", "Check code", checkVerificationCode, "btn btn-white btn-animation", "button_cont");
+            break;
+        case "checkVerificationCode":
+            console.log(data);
+            if(data == "success"){
+                alert("Verification successful");
+                
+                window.location.pathname = 'Client/chat.html';
+            }else{
+                alert("Verification failed");
+            }
             break;
         case "login":
             if(data === "success") {
-                storeValue("username", username);
-
                 window.location.pathname = 'Client/chat.html';
             } else {
                 alert("Login failed");
@@ -73,6 +230,48 @@ socket.onmessage = function(event) {
                 if(!window.location.pathname == 'Client/index.html')
                     window.location.pathname = 'Client/index.html';
             }
+            break;
+        case "register":
+            if(data == "success"){
+                alert("Registration successful, please check your mail for the verification code");
+                storeValue("username", username);
+                location.reload();
+            }else{
+                alert(data);
+            }
+            break;
+
+        case "forgotPassword":
+            if(data == "success"){
+                mail = document.getElementById("mail").value;
+                document.getElementById("mail_check_button").remove();
+                document.getElementById("mail").remove();
+                createInput("text", "code", "Verification code...", "user", "input_cont");
+                createButton("code_check_button", "Check code", checkCode, "btn btn-white btn-animation", "button_cont");
+            }else{
+                alert(data);
+            }
+            break;
+        case "checkForgotCode":
+            if(data == "success"){
+                code = document.getElementById("code").value;
+                document.getElementById("code_check_button").remove();
+                document.getElementById("code").remove();
+                createInput("password", "password", "New password...", "user", "input_cont");
+                createInput("password", "passwordverify", "Verify password...", "user", "input_cont");
+                createButton("change_password_button", "Change password", changePassword, "btn btn-white btn-animation", "button_cont");
+            }else{
+                alert(data);
+            }
+            break;
+        case "changeForgotPassword":
+            if(data == "success"){
+                alert("Password changed!");
+                location.reload();
+            }else{
+                alert(data);
+            }
+            break;
         default:
             console.log(data);
             

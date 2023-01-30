@@ -62,6 +62,7 @@ public class Server extends WebSocketServer {
         database.createDraftTable();
         database.createForgotPasswordTable();
         database.createAdminCodeTable();
+        database.createMailVerificationTable();
 	}
 
     /**
@@ -245,8 +246,8 @@ public class Server extends WebSocketServer {
      * @param password The password of the user
      * @return A boolean value.
      */
-    public boolean register(String username, String password) throws SQLException{
-        return database.newUser(username, password, "https://i.ibb.co/NsJGFh6/istockphoto-522855255-612x612-modified.png", null);
+    public boolean register(String username, String password, String mail) throws SQLException{
+        return database.newUser(username, password, "https://i.ibb.co/NsJGFh6/istockphoto-522855255-612x612-modified.png", mail);
     }
 
     /**
@@ -330,6 +331,24 @@ public class Server extends WebSocketServer {
     }
 
     /**
+     * It takes a username and returns a string of 7 characters from the username, and a random number
+     * between 0 and 9
+     * 
+     * @param username The username of the user who is trying to register.
+     * @return A string of 7 characters from the username, and a random number.
+     */
+    public String generateVerificateCode(String username){
+        String code = "";
+        for(int i = 0; i < 7; i++){
+            code += username.charAt((int)(Math.random() * username.length()));
+        }
+        if(Math.random() > 0.5){
+            code += (int)(Math.random() * 10);
+        }
+        return code;
+    }
+
+    /**
      * It handles all the messages that are sent to the server
      * 
      * @param msg The message object that contains all the information about the message
@@ -352,11 +371,28 @@ public class Server extends WebSocketServer {
                     if(database.getLoginID(msg.getUsername()) != null){
                         database.removeLoginID(msg.getUsername());
                     }
-                    database.addLoginID(msg.getUsername(), generateLoginID(msg.getUsername()));
-                    sendTo(msg.getConn(), new Message("loginID", msg.getUsername(), msg.getUsername(), database.getLoginID(msg.getUsername())));
-                    sendTo(msg.getConn(), new Message("login", msg.getUsername(), msg.getUsername(), "success"));
+                    if(database.needVerification(msg.getUsername())){
+                        sendTo(msg.getConn(), new Message("needVerification", msg.getUsername(), msg.getUsername(), "true"));
+                    }
+                    else{
+                        database.addLoginID(msg.getUsername(), generateLoginID(msg.getUsername()));
+                        sendTo(msg.getConn(), new Message("loginID", msg.getUsername(), msg.getUsername(), database.getLoginID(msg.getUsername())));
+                        sendTo(msg.getConn(), new Message("login", msg.getUsername(), msg.getUsername(), "success"));
+                    }
                 }else{
                     sendTo(msg.getConn(), new Message("login", msg.getUsername(), msg.getUsername(), "Login failed, wrong username or password"));
+                }
+                break;
+            case "checkVerificationCode":
+                if(database.checkIfVerificationCodeExists(msg.getUsername(), msg.getData())){
+                    database.removeVerificationCode(msg.getUsername(), msg.getData());
+                String loginID = generateLoginID(msg.getUsername());
+                database.addLoginID(msg.getUsername(), loginID);
+                sendTo(msg.getConn(), new Message("loginID", msg.getUsername(), msg.getUsername(), loginID));
+                sendTo(msg.getConn(), new Message("checkVerificationCode", msg.getUsername(), msg.getUsername(), "success"));
+                database.removeVerificationCode(msg.getUsername(), msg.getData());
+                }else{
+                    sendTo(msg.getConn(), new Message("checkVerificationCode", msg.getUsername(), msg.getUsername(), "false"));
                 }
                 break;
             case "checkLoginID":
@@ -375,8 +411,11 @@ public class Server extends WebSocketServer {
                 sendTo(msg.getReceiver(), msg.getMessage());
                 break;
             case "register":
-                if(register(msg.getUsername(), msg.getData())){
+                if(register(msg.getUsername(), msg.getData(), msg.getReceiver())){
+                    String code = generateVerificateCode(msg.getUsername());
                     sendTo(msg.getConn(), new Message("register", msg.getUsername(), msg.getUsername(), "success"));
+                    mailClient.sendMail("no-reply@kapindustries.it",  msg.getReceiver(), "Verification code", "Your verification code is: " + code);
+                    database.addVerificationCode(msg.getUsername(), msg.getReceiver(), code);
                 }else{
                     sendTo(msg.getConn(), new Message("register", msg.getUsername(), null, "Username already exists"));
                 }
@@ -520,7 +559,6 @@ public class Server extends WebSocketServer {
                 if(database.isAdministator(msg.getUsername())){
                     String adminCode = generateAdminCode(msg.getUsername());
                     database.addAdminCode(msg.getUsername(), adminCode);
-
                     sendTo(msg.getConn(), new Message("isAdministrator", msg.getUsername(), msg.getUsername(), "true"));
                     mailClient.sendMail("no-reply@kapindustries.it", database.getMail(msg.getUsername()), "Admin Code", "Hi " + msg.getUsername() + ", your admin code is " + adminCode + ". Please do not share it with anyone." + "\n If you did not request this code, contact Administrator immediately. \n This code will expire in 5 minutes.");
                 }else{
@@ -551,6 +589,22 @@ public class Server extends WebSocketServer {
                     return;
                 }
                 database.removeUser(msg.getData());
+                break;
+            case "changeUsername":
+                if(database.checkUsernameExists(msg.getData())){
+                    sendTo(msg.getConn(), new Message("changeUsername", msg.getUsername(), msg.getUsername(), "Username already exists"));
+                }else{
+                    database.changeUsername(msg.getUsername(), msg.getData());
+                    sendTo(msg.getConn(), new Message("changeUsername", msg.getUsername(), msg.getUsername(), "success"));
+                }
+                break;
+            case "changeEmail":
+                if(database.checkMailExists(msg.getData())){
+                    sendTo(msg.getConn(), new Message("changeEmail", msg.getUsername(), msg.getUsername(), "Mail already exists"));
+                }else{
+                    database.changeMail(msg.getUsername(), msg.getData());
+                    sendTo(msg.getConn(), new Message("changeEmail", msg.getUsername(), msg.getUsername(), "success"));
+                }
                 break;
             case "deleteAllUsers":
                 if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){

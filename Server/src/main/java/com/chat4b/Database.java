@@ -80,6 +80,7 @@ public class Database {
                 + "	username text ,\n"
                 + "	message text ,\n"
                 + "	receiver text, \n"
+                + " id text, \n"
                 + " date text \n"
                 + ");";
 
@@ -188,6 +189,24 @@ public class Database {
         }
     }
 
+    public void createMailVerificationTable(){
+        // SQL statement for creating a new table
+        String sql = "CREATE TABLE IF NOT EXISTS mailverification (\n"
+                + " username text ,\n"
+                + "	mail text, \n"
+                + "	code text, \n"
+                + " date text \n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            // create a new table
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     /**
      * It takes 4 strings as parameters and inserts them into the database
      * 
@@ -206,6 +225,25 @@ public class Database {
         pstmt.setString(4, mail);
         pstmt.executeUpdate();
         return true;
+    }
+
+    public boolean checkUsernameExists(String username) throws SQLException{
+        String sql = "SELECT username FROM users WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    public void changeUsername(String username, String newUsername) throws SQLException{
+        String sql = "UPDATE users SET username = ? WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, newUsername);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
     }
 
     /**
@@ -405,7 +443,7 @@ public class Database {
         if(checkIfUserAlreadyHaveAdminCode(username)){
             removeAdminCode(username);
         }
-        String sql = "INSERT INTO admincode(username, code) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO admincode(username, code, date) VALUES(?, ?, ?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, username);
         pstmt.setString(2, code);
@@ -631,14 +669,27 @@ public class Database {
             System.out.println("Receiver is null");
             return;
         }
-        String sql = "INSERT INTO messages(datatype, username, message, receiver, date) VALUES(?,?,?,?,?)";
+        int id = getLatestMessageId() + 1;
+        
+        String sql = "INSERT INTO messages(datatype, username, message, receiver, id, date) VALUES(?,?,?,?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, "message");
         pstmt.setString(2, msg.getUsername());
         pstmt.setString(3, msg.getData());
         pstmt.setString(4, msg.getReceiver());
-        pstmt.setString(5, msg.getDate());
+        pstmt.setString(5, Integer.toString(id));
+        pstmt.setString(6, msg.getDate());
         pstmt.executeUpdate();
+    }
+
+    public int getLatestMessageId() throws SQLException{
+        String sql = "SELECT id FROM messages ORDER BY id DESC LIMIT 1";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return rs.getInt("id");
+        }
+        return 0;
     }
 
     /**
@@ -937,4 +988,71 @@ public class Database {
         pstmt.executeUpdate();
         return true;
     }
+
+    /**
+     * It adds a verification code to the database
+     * 
+     * @param username the username of the user
+     * @param mail the email address of the user
+     * @param code the verification code
+     */
+    public void addVerificationCode(String username, String mail, String code) throws SQLException{
+        String sql = "INSERT INTO mailverification(username, mail, code) VALUES(?,?,?)";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, mail);
+        pstmt.setString(3, code);
+        pstmt.executeUpdate();
+    }
+
+    /**
+     * It checks if a verification code exists in the database
+     * 
+     * @param username The username of the user
+     * @param mail the mail that the user entered
+     * @param code The code that the user has entered
+     * @return A boolean value.
+     */
+    public boolean checkIfVerificationCodeExists(String username, String code) throws SQLException{
+        String sql = "SELECT * FROM mailverification WHERE username = ? AND code = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, code);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * It deletes a row from the verification table where the username, mail and code are equal to the
+     * parameters
+     * 
+     * @param username The username of the user
+     * @param mail the email address of the user
+     * @param code The code that was sent to the user's email
+     */
+    public void removeVerificationCode(String username, String code) throws SQLException{
+        String sql = "DELETE FROM mailverification WHERE username = ? AND code = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, code);
+        pstmt.executeUpdate();
+    }
+
+    public boolean needVerification(String username) throws SQLException{
+        String sql = "SELECT * FROM mailverification WHERE username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+
 }
+
+

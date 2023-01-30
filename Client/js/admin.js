@@ -51,6 +51,31 @@ let deleteUser = (username) => {
     socket.send(JSON.stringify(mesagge));
 }
 
+let changeUsername = (username) => {
+    let newUsername = prompt("Enter new username");
+    mesagge = {
+        "operation" : "changeUsername",
+        "username": getStoredValue("username"),
+        "receiver": getStoredValue("adminCode"),
+        "data": newUsername,
+        "date": new Date().toISOString()
+    }
+    socket.send(JSON.stringify(mesagge));
+}
+
+let changeEmail = (username) => {
+    let newEmail = prompt("Enter new email");
+    mesagge = {
+        "operation" : "changeEmail",
+        "username": getStoredValue("username"),
+        "receiver": getStoredValue("adminCode"),
+        "data": newEmail,
+        "date": new Date().toISOString()
+    }
+    socket.send(JSON.stringify(mesagge));
+}
+
+
 let deleteAllUsers = () => {
     mesagge = {
         "operation" : "deleteAllUsers",
@@ -130,8 +155,21 @@ socket.onmessage = function(event) {
             cell1.innerHTML = "<img src='" + data + "' alt='Profile Picture' width='50' height='50'>";
             cell2.innerHTML = username;
             cell3.innerHTML = receiver;
-            cell4.innerHTML = "<button onclick='deleteUser(\"" + username + "\")'>Delete</button>";
+            cell4.innerHTML = "<button onclick='deleteUser(\"" + username + "\")'>Delete</button> <button onclick='changeUsername(\"" + username + "\")'>Change Username</button> <button onclick='changeEmail(\"" + username + "\")'>Change Email</button>";
             break;
+        case "changeUsername":
+            if(data == "true"){
+                alert("Username changed");
+            }else{
+                alert("Username not changed");
+            }
+            break;
+        case "changeEmail":
+            if(data == "true"){
+                alert("Email changed");
+            }else{
+                alert("Email not changed");
+            }
         default:
             console.log(data);
             
