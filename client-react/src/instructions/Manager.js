@@ -1,27 +1,46 @@
-import WebSocket from 'ws';
+
 
 class Manager {
     constructor(onOpen, messageArrived, onClose) {
-        this.socket = new WebSocket("ws://192.168.1.3:8887/");
+        console.log("Manager created");
+        this.socket = new WebSocket("ws://87.4.163.109:8887/");
         this.onOpen = onOpen;
         this.messageArrived = messageArrived;
         this.onClose = onClose;
         
         this.socket.onopen = function (event) {
-            this.onOpen(event);
+            onOpen(event);
         }
     
         this.socket.onmessage = function (event) {
-            this.messageArrived(event);
+            messageArrived(event);
         }
     
         this.socket.onclose = function (event) {
-            this.onClose(event);
+            onClose(event);
         }
     }
 
-    sendtoServer(message) {
+    sendToServer(message) {
         this.socket.send(message);
+    }
+
+    storeValue(key, value) {
+        if (localStorage) {
+            localStorage.setItem(key, value);
+        }
+    }
+
+    getStoredValue(key) {
+        if (localStorage) {
+            return localStorage.getItem(key);
+        }
+    }
+
+    deleteStoredValue(key) {
+        if (localStorage) {
+            localStorage.removeItem(key);
+        } 
     }
 }
 
