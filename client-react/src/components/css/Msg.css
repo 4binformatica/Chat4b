@@ -1,0 +1,24 @@
+.message {
+    background-color: #f1f0f0;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    width: 40%;
+    display: inline-block;
+    word-wrap: break-word;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #000;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    
+}
+
+.sent {
+    background-color: #dcf8c6;
+    float: right;
+}
+
+.received {
+    background-color: #f1f0f0;
+    float: left;
+}
