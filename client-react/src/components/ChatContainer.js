@@ -22,7 +22,6 @@ class ChatContainer extends React.Component {
 
         return (
             <>
-                <h1>ChatContainer</h1>
                 <div className="chat-container">
                     {this.messages}
                 </div>

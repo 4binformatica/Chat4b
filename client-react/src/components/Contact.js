@@ -9,10 +9,10 @@ class Contact extends React.Component {
     render() {
         return (
         <div className="contact" onClick={this.contactClicked}>
-            <img src={this.pic} alt="Profile Picture" className="profile-picture" />
+            <img src={this.pic} alt="Profile Picture" className="contact-picture" />
             <div className="contact-info">
-            <h2>{this.props.username}</h2>
-            <p>{this.props.status}</p>
+                <h2>{this.props.username}</h2>
+                <p>{this.props.status}</p>
             </div>
         </div>
         );

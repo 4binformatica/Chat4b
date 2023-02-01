@@ -8,18 +8,26 @@
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+    border-radius: 12px;
 }
 
 .selected {
-    background-color: #60af4c; /* Green */
+    background-color: #F3FC89; /* Green */
+    color : #000000;
 }
 
 .not-selected {
-    background-color: #ff0000; /* Red */
+    background-color: #000000; /* Red */
 }
 
 .logo {
-    width: 100px;
-    height: 100px;
+    width: 50px;
+    height:30px;
     margin: 0 auto;
+}
+
+.header {
+    height: 6vh;
+    width: 100;
+    background-color: #20232B;
 }

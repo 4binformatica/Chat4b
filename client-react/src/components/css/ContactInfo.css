@@ -1,0 +1,32 @@
+.cont-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 57px;
+    height: 100vh;
+    background-color: #20232B;
+}
+
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.profile {
+    margin-top: 20px;
+    font-size: 24px;
+}
+
+p {
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+}

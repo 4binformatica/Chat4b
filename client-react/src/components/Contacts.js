@@ -13,7 +13,7 @@ class Contacts extends React.Component {
   render() {
     return (
         <>
-            <div id="contacts">
+            <div id="contacts" className="contacts">
                 {this.contacts}
             </div>
         </>

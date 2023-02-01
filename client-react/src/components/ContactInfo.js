@@ -20,9 +20,9 @@ class ContactInfo extends React.Component {
         }
         return (
         <>
-            <div className="contact-info">
+            <div className="cont-info">
                 <img src={this.contactPic } alt="Profile Picture" className="profile-picture" />
-                <h2>{this.props.selectedContact}</h2>
+                <h2 className="profile">{this.props.selectedContact}</h2>
                 <p>{this.contactBio}</p>
             </div>
         </>

@@ -25,19 +25,19 @@ class Chat extends React.Component {
           <Header currentWindow={currentWindow} setCurrentWindow={setCurrentWindow} />
         </div>
         <div>
-          <Section currentSection={selectedSelection} setCurrentSection={setSelectedSelection} />
+          <Section className="section" currentSection={selectedSelection} setCurrentSection={setSelectedSelection} />
         </div>
         <div>
-          <Contacts currentSection={selectedSelection} selectedContact={selectedContact} setSelectedContact={setSelectedContact} myUsername={myUsername} setMyUsername={setMyUsername} />
+          <Contacts className="contacts" currentSection={selectedSelection} selectedContact={selectedContact} setSelectedContact={setSelectedContact} myUsername={myUsername} setMyUsername={setMyUsername} />
         </div>
         <div>
-          <ChatContainer currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
+          <ChatContainer className="chatContainer" currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
         </div>
         <div>
-          <MessageInput currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
+          <MessageInput className="messageInput" currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
         </div>
         <div>
-          <ContactInfo currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
+          <ContactInfo className="ContactInfo" currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
         </div>
         </>
     );
