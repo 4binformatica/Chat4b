@@ -1,11 +1,12 @@
 import React, { createContext} from "react";
 import { createStore } from 'state-pool';
-import Login from './components/Login.js';
-import Register from './components/Register.js';
-import Forgot from './components/Forgot.js';
+import Login from './pages/Login.js';
+import Register from './pages/Register.js';
+import Forgot from './pages/Forgot.js';
+import Window from './pages/Window.js';
 
 const store = createStore();
-store.setState("currentComponent", "login");
+store.setState("currentComponent", "window");
 
 function App() {
 
@@ -31,18 +32,12 @@ function App() {
           <Forgot setCurrentComponent={setCurrentComponent}/>
         </div>
       );
-      /*case "chat":
-        return (
-          <div>
-            <Chat setCurrentComponent={setCurrentComponent}/>
-          </div>
-        );
-      case "settings":
-        return (
-          <div>
-            <Settings setCurrentComponent={setCurrentComponent}/>
-          </div>
-        );*/
+    case "window":
+      return (
+        <div>
+          <Window setCurrentComponent={setCurrentComponent}/>
+        </div>
+      );
     default:
       return (
         <div>

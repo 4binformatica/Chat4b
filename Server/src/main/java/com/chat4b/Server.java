@@ -621,9 +621,20 @@ public class Server extends WebSocketServer {
             
             case "keepAlive":
                 break;
+
+
+            case "createGroup":
+                break;
+            case "addUserToGroup":
+                break;
+            case "removeUserFromGroup":
+                break;
+            case "deleteGroup":
+                break;
             default:
                 System.out.println("Unknown operation: " + msg.getOperation());
                 break;
+
         }
     }
 
