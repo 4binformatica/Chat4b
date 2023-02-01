@@ -1,4 +1,5 @@
 import React from "react";
+import "./css/MessageInput.css";
 import Manager from "../instructions/Manager";
 
 class MessageInput extends React.Component {

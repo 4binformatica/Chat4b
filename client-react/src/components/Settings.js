@@ -1,4 +1,5 @@
 import React from 'react';
+import './css/Settings.css';
 import Manager from '../instructions/Manager';
 
 class Settings extends React.Component {

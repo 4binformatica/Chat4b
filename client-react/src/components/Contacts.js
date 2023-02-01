@@ -1,4 +1,5 @@
 import React from "react";
+import "./css/Contacts.css";
 import Manager from "../instructions/Manager";
 import Contact from "../components/Contact";
 

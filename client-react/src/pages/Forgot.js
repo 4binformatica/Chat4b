@@ -1,4 +1,5 @@
 import React from 'react';
+import './css/Forgot.css';
 import Manager from '../instructions/Manager';
 
 class Forgot extends React.Component {

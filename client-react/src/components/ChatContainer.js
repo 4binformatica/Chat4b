@@ -1,6 +1,8 @@
 import React from "react";
+import "./css/ChatContainer.css";
 import Manager from "../instructions/Manager";
 import Msg from "../components/Msg";
+
 
 class ChatContainer extends React.Component {
     constructor(props){

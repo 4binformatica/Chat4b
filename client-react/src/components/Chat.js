@@ -1,4 +1,5 @@
 import React from 'react';
+import './css/Chat.css';
 import Header from '../components/Header.js';
 import Section from '../components/Section.js';
 import Contacts from '../components/Contacts.js';

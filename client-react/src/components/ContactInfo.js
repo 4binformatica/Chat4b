@@ -1,4 +1,5 @@
 import React from "react";
+import "./css/ContactInfo.css";
 import Manager from "../instructions/Manager";
 
 class ContactInfo extends React.Component {

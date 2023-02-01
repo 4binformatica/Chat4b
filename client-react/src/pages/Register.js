@@ -1,4 +1,5 @@
 import React from 'react';
+import './css/Register.css';
 import Manager from '../instructions/Manager';
 
 class Register extends React.Component {
