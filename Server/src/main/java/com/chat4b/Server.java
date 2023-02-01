@@ -63,6 +63,7 @@ public class Server extends WebSocketServer {
         database.createForgotPasswordTable();
         database.createAdminCodeTable();
         database.createMailVerificationTable();
+        database.createGroupTable();
 	}
 
     /**
@@ -624,13 +625,62 @@ public class Server extends WebSocketServer {
 
 
             case "createGroup":
+                String groupName = msg.getData();
+                String admin = msg.getUsername();  
+                
+                ArrayList<String> members = new ArrayList<>();
+                members.add(admin);
+                String membersString = msg.getReceiver();
+                
+                membersString = membersString.substring(1, membersString.length() - 1);
+                String[] membersArray = membersString.split(",");
+                for(String member : membersArray){
+                    System.out.println(member);
+                    members.add(member);
+                }
+
+                database.createGroup(groupName);
+
+                database.addAdminToGroup(groupName, admin);
+                for(String member : members){
+                    database.addUserToGroup(groupName, member);
+                }
+                sendTo(msg.getConn(), new Message("createGroup", msg.getUsername(), msg.getUsername(), "success"));
                 break;
             case "addUserToGroup":
+                //check if the user is an admin of the group
+                if(!database.isAdminOfGroup(msg.getData(), msg.getUsername())){
+                    sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "You are not an admin of this group"));
+                    return;
+                }
+                //check if the user is already in the group
+                if(database.isInGroup(msg.getData(), msg.getReceiver())){
+                    sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "User is already in the group"));
+                    return;
+                }
+                database.addUserToGroup(msg.getData(), msg.getReceiver());
+                sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "success"));
                 break;
             case "removeUserFromGroup":
+                //check if the user is an admin of the group
+                if(!database.isAdminOfGroup(msg.getData(), msg.getUsername())){
+                    sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "You are not an admin of this group"));
+                    return;
+                }
+                //check if the user is in the group
+                if(!database.isInGroup(msg.getData(), msg.getReceiver())){
+                    sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "User is not in the group"));
+                    return;
+                }
+                if(database.isAdminOfGroup(msg.getData(), msg.getReceiver())){
+                    sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "You can't remove an admin from the group"));
+                    return;
+                }
+                database.removeUserFromGroup(msg.getData(), msg.getReceiver());
                 break;
             case "deleteGroup":
                 break;
+
             default:
                 System.out.println("Unknown operation: " + msg.getOperation());
                 break;

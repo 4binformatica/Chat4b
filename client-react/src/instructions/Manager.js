@@ -1,5 +1,3 @@
-
-
 class Manager {
     constructor(onOpen, messageArrived, onClose) {
         console.log("Manager created");

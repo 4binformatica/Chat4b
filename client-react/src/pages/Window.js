@@ -1,37 +1,56 @@
 import React from 'react';
 import Chat from '../components/Chat.js';
 import Settings from '../components/Settings.js';
-import { createStore } from 'state-pool';
 
-const store = createStore();
-store.setState("currentWindow", "chat");
-store.setState("selectedContact", null);
-store.setState("myUsername", null);
-store.setState("selectedSection", null);
 
 class Window extends React.Component{
     constructor(props){
         super(props);
-        this.onStart();
+        this.state = {
+            currentWindow: "chat",
+            selectedSelection: "all",
+            selectedContact: null,
+            myUsername: "kap",
+
+          };
     }
     render(){
-        
-            switch(this.currentWindow){
+            switch(this.state.currentWindow){
+                case "chat":
+                    return(
+                        <Chat currentWindow={this.state.currentWindow} setCurrentWindow={this.setCurrentWindow} selectedSelection={this.state.selectedSelection} setSelectedSelection={this.setSelectedSelection} selectedContact={this.state.selectedContact} setSelectedContact={this.setSelectedContact} myUsername={this.state.myUsername} setMyUsername={this.setMyUsername} />
+                    );
+                case "settings":
+                    return(
+                        <Settings currentWindow={this.state.currentWindow} setCurrentWindow={this.setCurrentWindow} />
+                    );
                 default:
                     return(
-                        <Chat store={store}/>
+                        <Chat currentWindow={this.state.currentWindow} setCurrentWindow={this.setCurrentWindow} selectedSelection={this.state.selectedSelection} setSelectedSelection={this.setSelectedSelection} />
                     );
 
             }
     };
 
-    onStart(){
-        this.currentWindow = store.getState("currentWindow");
-        this.selectedContact = store.getState("selectedContact");
-        this.myUsername = store.getState("myUsername");
-        this.selectedSection = store.getState("selectedSection");
-        this.setCurrentWindow = store.setState("currentWindow");
+    setCurrentWindow = (newWindow) => {
+        this.setState({currentWindow: newWindow});
+      }
+
+    setSelectedSelection = (newSelection) => {
+        console.log("new selection: " + newSelection);
+        this.setState({selectedSelection: newSelection});
     }
+
+    setSelectedContact = (newContact) => {
+        this.setState({selectedContact: newContact});
+    }
+
+    setMyUsername = (newUsername) => {
+        this.setState({myUsername: newUsername});
+    }
+
+
+      
 
 }
 
