@@ -207,6 +207,23 @@ public class Database {
         }
     }
 
+        //create group table with groupname, members, admin
+    public void createGroupTable() throws SQLException{
+        String sql = "CREATE TABLE IF NOT EXISTS groups (\n"
+                + " groupname text ,\n"
+                + " username text, \n"
+                + " role text \n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            // create a new table
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     /**
      * It takes 4 strings as parameters and inserts them into the database
      * 
@@ -1055,145 +1072,95 @@ public class Database {
 
     //*GROUP */
 
-    //create group table with groupname, members, admin
-    public void createGroupTable() throws SQLException{
-        String sql = "CREATE TABLE IF NOT EXISTS groups(groupname VARCHAR(255), members VARCHAR(255), admin VARCHAR(255))";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.executeUpdate();
-    }
 
-    //add group to group table
-    public void createGroup(String groupname) throws SQLException{
-        String sql = "INSERT INTO groups(groupname, members, admin) VALUES(?,?,?)";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, groupname);
-        pstmt.setString(2, "[]");
-        pstmt.setString(3, "[]");
-        pstmt.executeUpdate();  
-    }
+
 
     public boolean isAdminOfGroup(String groupName, String username) throws SQLException{
-        //get the admin string from the group
-        String sql = "SELECT * FROM groups WHERE groupname = ?";
+        //check if user is admin of group
+        String sql = "SELECT * FROM groups WHERE groupname = ? AND username = ? AND role = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
+        pstmt.setString(2, username);
+        pstmt.setString(3, "admin");
         ResultSet rs = pstmt.executeQuery();
-        String admin = rs.getString("admin");
-        //the string is in the format [admin1,admin2,admin3]
-        //so we need to remove the brackets and split the string
-        admin = admin.replace("[", "");
-        admin = admin.replace("]", "");
-        String[] admins = admin.split(",");
-        for(String s : admins){
-            if(s.equals(username)){
-                return true;
-            }
+        if(rs.next()){
+            return true;
         }
         return false;
     }
 
     public boolean isInGroup(String groupName, String username) throws SQLException{
-        //get the members string from the group
-        String sql = "SELECT * FROM groups WHERE groupname = ?";
+        //check if user is in group
+        String sql = "SELECT * FROM groups WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
+        pstmt.setString(2, username);
         ResultSet rs = pstmt.executeQuery();
-        String members = rs.getString("members");
-        //the string is in the format [member1,member2,member3]
-        //so we need to remove the brackets and split the string
-        members = members.replace("[", "");
-        members = members.replace("]", "");
-        String[] member = members.split(",");
-        for(String s : member){
-            if(s.equals(username)){
-                return true;
-            }
-        }
+        if(rs.next()){
+            return true;
+        }        
         return false;
-        
     }
 
     public void addUserToGroup(String groupName, String username) throws SQLException{
-        if(isInGroup(groupName, username)){
+        //add user to group
+        if(!userExist(username) || isInGroup(groupName, username)){
             return;
         }
-        //in the database we have a string of members in the format [member1,member2,member3]
-        //so we need to substitute the last bracket with a comma and the username and then add a bracket
-        String sql = "SELECT * FROM groups WHERE groupname = ?";
+        String sql = "INSERT INTO groups(groupname, username, role) VALUES(?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
-        ResultSet rs = pstmt.executeQuery();
-        String members = rs.getString("members");
-        members = members.replace("]", "," + username + "]");
-        members = members.replace("[,", "[");
-        members = members.replace(",]", "]");
-        sql = "UPDATE groups SET members = ? WHERE groupname = ?";
-        pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, members);
-        pstmt.setString(2, groupName);
+        pstmt.setString(2, username);
+        pstmt.setString(3, "member");
         pstmt.executeUpdate();
     }
 
     public void removeUserFromGroup(String groupName, String username) throws SQLException{
-        if(!isInGroup(groupName, username)){
-            return;
-        }
-        //in the database we have a string of members in the format [member1,member2,member3]
-        //so we need to remove the username from the string
-        String sql = "SELECT * FROM groups WHERE groupname = ?";
+        //remove user from group
+        String sql = "DELETE FROM groups WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
-        ResultSet rs = pstmt.executeQuery();
-        String members = rs.getString("members");
-        members = members.replace(username + ",", "");
-        members = members.replace("," + username, "");
-        members = members.replace(username, "");
-        sql = "UPDATE groups SET members = ? WHERE groupname = ?";
-        pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, members);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();        
+    }
+
+    public void setGroupAdmin(String groupName, String username) throws SQLException{
+        //set user as admin of group
+        String sql = "UPDATE groups SET role = ? WHERE groupname = ? AND username = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, "admin");
         pstmt.setString(2, groupName);
+        pstmt.setString(3, username);
         pstmt.executeUpdate();
     }
 
-    public void addAdminToGroup(String groupName, String username) throws SQLException{
-        if(isAdminOfGroup(groupName, username)){
-            return;
-        }
-        //in the database we have a string of admins in the format [admin1,admin2,admin3]
-        //so we need to substitute the last bracket with a comma and the username and then add a bracket
-        String sql = "SELECT * FROM groups WHERE groupname = ?";
+    public void revokeGroupAdmin(String groupName, String username) throws SQLException{
+        //revoke admin rights from user
+        String sql = "UPDATE groups SET role = ? WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, groupName);
-        ResultSet rs = pstmt.executeQuery();
-        String admins = rs.getString("admin");
-        admins = admins.replace("]", "," + username + "]");
-        admins = admins.replace("[,", "[");
-        admins = admins.replace(",]", "]");
-        sql = "UPDATE groups SET admin = ? WHERE groupname = ?";
-        pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, admins);
+        pstmt.setString(1, "member");
         pstmt.setString(2, groupName);
-        pstmt.executeUpdate();
+        pstmt.setString(3, username);
+        pstmt.executeUpdate();        
     }
 
-    public void removeAdminFromGroup(String groupName, String username) throws SQLException{
-        if(!isAdminOfGroup(groupName, username)){
-            return;
-        }
-        //in the database we have a string of admins in the format [admin1,admin2,admin3]
-        //so we need to remove the username from the string
+    public boolean checkIfGroupExists(String groupName) throws SQLException{
+        //check if group exists
         String sql = "SELECT * FROM groups WHERE groupname = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
         ResultSet rs = pstmt.executeQuery();
-        String admins = rs.getString("admin");
-        admins = admins.replace(username + ",", "");
-        admins = admins.replace("," + username, "");
-        admins = admins.replace(username, "");
-        sql = "UPDATE groups SET admin = ? WHERE groupname = ?";
-        pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, admins);
-        pstmt.setString(2, groupName);
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteGroup(String groupName) throws SQLException{
+        //delete group
+        String sql = "DELETE FROM groups WHERE groupname = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, groupName);
         pstmt.executeUpdate();
     }
     

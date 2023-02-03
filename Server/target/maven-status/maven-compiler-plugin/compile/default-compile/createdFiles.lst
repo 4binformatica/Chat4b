@@ -1,6 +1,10 @@
-com\chat4b\ImgbbResponse.class
-com\chat4b\Message.class
-com\chat4b\ImgbbResponse$Data.class
-com\chat4b\Database.class
-com\chat4b\App.class
-com\chat4b\Server.class
+com/chat4b/Server.class
+com/chat4b/WebServer.class
+com/chat4b/MailClient$1.class
+com/chat4b/Config.class
+com/chat4b/Message.class
+com/chat4b/MailClient.class
+com/chat4b/App.class
+com/chat4b/Database.class
+com/chat4b/ImgbbResponse$Data.class
+com/chat4b/ImgbbResponse.class

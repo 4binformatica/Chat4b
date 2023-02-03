@@ -625,73 +625,93 @@ public class Server extends WebSocketServer {
 
 
             case "createGroup":
-                String groupName = msg.getData();
-                String admin = msg.getUsername();  
-                
-                ArrayList<String> members = new ArrayList<>();
-                members.add(admin);
-                String membersString = msg.getReceiver();
-                
-                membersString = membersString.replace("[", "");
-                membersString = membersString.replace("]", "");
+                {
+                    String groupName = msg.getData();
+                    String admin = msg.getUsername();
+                    String groupMembers = msg.getReceiver();
 
-                String[] membersArray = membersString.split(",");
-                for(String member : membersArray){
-                    System.out.println(member);
-                    members.add(member);
+                    if(database.checkIfGroupExists(groupName)){
+                        sendTo(msg.getConn(), new Message("createGroup", msg.getUsername(), msg.getUsername(), "Group already exists"));
+                        return;
+                    }
+
+                    groupMembers = groupMembers.replace("[", "");
+                    groupMembers = groupMembers.replace("]", "");
+                    String[] members = groupMembers.split(",");
+                    database.addUserToGroup(groupName, admin);
+                    for(int i = 0; i < members.length; i++){
+                        if(!database.userExist(members[i])){
+                            sendTo(msg.getConn(), new Message("createGroup", msg.getUsername(), msg.getUsername(), "User " + members[i] + " does not exist"));
+                            continue;
+                        }
+                        database.addUserToGroup(groupName, members[i]);
+
+                    }
+                    database.setGroupAdmin(groupName, admin);
+                    sendTo(msg.getConn(), new Message("createGroup", msg.getUsername(), msg.getUsername(), "success"));
                 }
-
-                database.createGroup(groupName);
-
-                database.addAdminToGroup(groupName, admin);
-                for(String member : members){
-                    database.addUserToGroup(groupName, member);
-                }
-                sendTo(msg.getConn(), new Message("createGroup", msg.getUsername(), msg.getUsername(), "success"));
                 break;
             case "addUserToGroup":
-                //check if the user is an admin of the group
-                if(!database.isAdminOfGroup(msg.getData(), msg.getUsername())){
-                    sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "You are not an admin of this group"));
-                    return;
-                }
-                
-                //check if what is passed is a single user or a list of users
                 {
-                    String[] usernames = msg.getReceiver().split(",");
-                    for(String user : usernames){
-                        database.addUserToGroup(msg.getData(), user);
+                    String groupName = msg.getData();
+                    String groupMembers = msg.getReceiver();
+                    
+                    if(!database.isAdminOfGroup(groupName, msg.getUsername())){
+                        sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "You are not admin of this group"));
+                        return;
+                    }
+
+
+                    
+                    groupMembers = groupMembers.replace("[", "");
+                    groupMembers = groupMembers.replace("]", "");
+                    String[] members = groupMembers.split(",");
+                    
+                    for(int i = 0; i < members.length; i++){
+                        if(!database.userExist(members[i])){
+                            sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "User " + members[i] + " does not exist"));
+                            continue;
+                        }
+                        database.addUserToGroup(groupName, members[i]);
                     }
                     sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "success"));
-                }
-
-                
+                }                
                 break;
             case "removeUserFromGroup":
-                //check if the user is an admin of the group
-                if(!database.isAdminOfGroup(msg.getData(), msg.getUsername())){
-                    sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "You are not an admin of this group"));
-                    return;
-                }
-                  
-
-                if(database.isAdminOfGroup(msg.getData(), msg.getReceiver())){
-                    sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "You can't remove an admin from the group"));
-                    return;
-                }
-
-
                 {
-                    String[] usernames = msg.getReceiver().split(",");
-                    for(String user : usernames){
-                        System.out.println(user);
-                        database.removeUserFromGroup(msg.getData(), user);
+                    String groupName = msg.getData();
+                    String groupMembers = msg.getReceiver();
+
+                    if(!database.isAdminOfGroup(groupName, msg.getUsername())){
+                        sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "You are not admin of this group"));
+                        return;
+                    }
+                    
+                    groupMembers = groupMembers.replace("[", "");
+                    groupMembers = groupMembers.replace("]", "");
+                    String[] members = groupMembers.split(",");
+                    
+                    for(int i = 0; i < members.length; i++){
+                        if(!database.userExist(members[i])){
+                            sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "User " + members[i] + " does not exist"));
+                            continue;
+                        }                        
+                        database.removeUserFromGroup(groupName, members[i]);
                     }
                     sendTo(msg.getConn(), new Message("removeUserFromGroup", msg.getUsername(), msg.getUsername(), "success"));
                 }
-
+                
                 break;
             case "deleteGroup":
+                {
+                    String groupName = msg.getData();
+                    if(!database.isAdminOfGroup(groupName, msg.getUsername())){
+                        sendTo(msg.getConn(), new Message("deleteGroup", msg.getUsername(), msg.getUsername(), "You are not admin of this group"));
+                        return;
+                    }
+                    database.deleteGroup(groupName);
+                    sendTo(msg.getConn(), new Message("deleteGroup", msg.getUsername(), msg.getUsername(), "success"));
+                }
                 break;
 
             default:
