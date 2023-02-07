@@ -473,7 +473,10 @@ socket.addEventListener('message', (event) => {
             }
             break;
         case "profilePic":
+            if(document.getElementById("profilePic") != null)
+                document.getElementById("profilePic").remove();
             var image = document.createElement('img');
+            image.id = "profilePic";
             image.src =  data;
             image.width = 100;
             image.height = 100;

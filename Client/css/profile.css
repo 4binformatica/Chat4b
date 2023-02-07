@@ -4,7 +4,8 @@
     --mint-cream: #f4fffdff;
     --oxford-blue: #011936ff;
     --black-coral: hsl(212, 17%, 33%);
-    --sfondo: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(255,0,49,1) 100%);
+    --sfondo: linear-gradient(90deg, rgba(8,2,110,1) 0%, rgba(6,6,154,1) 100%);
+    --sfondoContainer: rgb(50, 1, 155);
     --font: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -33,13 +34,11 @@ div.small-title {
 }
 
 .containerSmallProfile {
-    width: 600px;
-    height: 400px;
     display: flex;
-    width: 70%;
+    width: 60%;
     height: 450px;
     border: 10px solid #011936;
-    background-color: #fff;
+    background-color: var(--sfondoContainer);
     color: #fff;
     border-radius: 20px;
     padding: 10px;
@@ -72,12 +71,13 @@ div.small-title {
 
     .textBoxBio {
         padding-left: 100px;
+        width: 100%;
     }
 
     .containerBio {
         border: 5px solid var(--oxford-blue);
         border-radius: 20px;
-        width: 300px;
+        width: 95%;
         height: 200px;
         padding: 5px;
     }
@@ -106,3 +106,52 @@ div.small-title {
         top: 15px;
     }
 
+button.btnExit {
+    position: relative;
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    top: 15px;
+    left: 50px;
+    transform: translateX(-50%);
+}
+
+input.mail, input.pass {
+    width: 60%;
+    height: 20px;
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    font-size: 20px;
+    font-family: var(--font);
+    background-color: var(--oxford-blue);
+    color: #fff;
+}
+
+button.editMail, button.saveMail {
+    padding: 10px;
+    position: relative;
+    width: 50px;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    left: 10px;
+}
+
+button.editPass, button.savePass {
+    padding: 10px;
+    position: relative;
+    width: 50px;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    left: 10px;
+}

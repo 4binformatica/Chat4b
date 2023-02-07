@@ -33,7 +33,7 @@ class Chat extends React.Component {
         <div>
           <ChatContainer className="chatContainer" currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
         </div>
-        <div>
+        <div className="messageInputContainer">
           <MessageInput className="messageInput" currentSection={selectedSelection} selectedContact={selectedContact} myUsername={myUsername} />
         </div>
         <div>

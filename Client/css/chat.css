@@ -4,14 +4,51 @@
     --mint-cream: #f4fffdff;
     --oxford-blue: #011936ff;
     --black-coral: hsl(212, 17%, 33%);
-    --sfondo: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(255,0,49,1) 100%);
+    --clMsgMandato:  #02387b;
+    --clMsgRicevuto: #1601d8;
+    --sfondo: linear-gradient(90deg, rgba(8,2,110,1) 0%, rgba(6,6,154,1) 100%);
+    --sfondoChat: rgb(40, 0, 126);
+    --sfondoSideBar: rgb(81, 1, 252);
     --font: -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+/* SCROLL BAR SETTINGS */
+
+.chat-messages::-webkit-scrollbar {
+  width: 16px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: var(--sfondoChat);
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: rgb(1, 25, 54);
+  border-radius: 10px;
+  border: 3px solid var(--sfondoChat);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 16px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--sfondoSideBar);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: rgb(1, 25, 54);
+  border-radius: 10px;
+  border: 3px solid var(--sfondoSideBar);
+}
+
+/* SCROLL BAR SETTINGS */
 
 body {
     background: var(--sfondo);
     overflow-x: hidden;
 }
+
 
 h4.small-title {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -89,7 +126,7 @@ div.small-title {
   
   .chat-container {
     width: 95%;
-    height: 400px;
+    height: 600px;
     background-color: #01193600;
     backdrop-filter: blur(10px);
     color: #fff;
@@ -101,7 +138,7 @@ div.small-title {
   
   .sidebar {
     width: 200px;
-    background-color: #fff;
+    background-color: var(--sfondoSideBar);
     color: #011936;
     border-radius: 10px;
     padding: 10px;
@@ -112,6 +149,7 @@ div.small-title {
   .sidebar-header {
     font-size: 20px;
     font-family: var(--font);
+    color: #fff;
     text-align: center;
     margin-bottom: 10px;
   }
@@ -151,9 +189,9 @@ div.small-title {
   .main-content {
     flex: 1;
     margin-left: 10px;
-    background-color: #ffffff99; 
+    background-color: var(--sfondoChat);
     backdrop-filter: blur(10px);
-    color: #011936;
+    color: #fff;
     border-radius: 10px;
     padding: 10px;
     backdrop-filter: blur(10px);
@@ -168,7 +206,7 @@ div.small-title {
   }
   
   .chat-messages {
-    height: 250px;
+    height: 450px;
     overflow-y: scroll;
     margin-bottom: 10px;
   }
@@ -189,7 +227,7 @@ div.small-title {
   
   .sent {
     font-family: var(--font);
-    background-color: #011936;
+    background-color: var(--clMsgMandato);
     border-radius: 10px;
     width: 100%;
     color: #fff;
@@ -198,8 +236,8 @@ div.small-title {
   .received {
     align-self: flex-start;
     font-family: var(--font);
-    background-color: #fff;
-    color: #011936;
+    background-color: var(--clMsgRicevuto);
+    color: #fff;
   }
 
   .image-send {
@@ -237,6 +275,11 @@ div.small-title {
     border: none;
     cursor: pointer;
     margin: 10px;
+  }
+
+  .btnSectionChat {
+    width: 100%;
+    text-align: center;
   }
 
   button.add-contact-button {
@@ -288,6 +331,18 @@ div.small-title {
     top: 15px;
   }
   button.changeProfilePic-button {
+    padding: 10px;
+    position: relative;
+    width: 5vw;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    top: 15px;
+  }
+
+  button.goToProfile-button {
     padding: 10px;
     position: relative;
     width: 5vw;

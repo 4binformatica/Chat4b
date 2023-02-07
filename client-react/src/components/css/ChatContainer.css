@@ -1,12 +1,15 @@
 .chat-container {
+    position: absolute;
+    left: 22px;
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 80%;
-    width: 100%;
+    width: 500px;
     padding: 20px;
     overflow-y: scroll;
     margin: 0 20px;
+
 }
 
 h1 {

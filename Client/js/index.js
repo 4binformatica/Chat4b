@@ -210,7 +210,7 @@ socket.onmessage = function(event) {
             console.log(data);
             if(data == "success"){
                 alert("Verification successful");
-                
+                storeValue("username", username);
                 window.location.pathname = 'Client/chat.html';
             }else{
                 alert("Verification failed");
@@ -218,6 +218,7 @@ socket.onmessage = function(event) {
             break;
         case "login":
             if(data === "success") {
+                storeValue("username", username);
                 window.location.pathname = 'Client/chat.html';
             } else {
                 alert("Login failed");

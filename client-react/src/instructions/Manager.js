@@ -1,7 +1,7 @@
 class Manager {
     constructor(onOpen, messageArrived, onClose) {
         console.log("Manager created");
-        this.socket = new WebSocket("ws://87.4.163.109:8887/");
+        this.socket = new WebSocket("ws://localhost:8887/");
         this.onOpen = onOpen;
         this.messageArrived = messageArrived;
         this.onClose = onClose;
