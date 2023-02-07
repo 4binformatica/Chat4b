@@ -103,6 +103,10 @@ public class Message {
         this.receiver = name;
     }
 
+    public void setUserName(String name) {
+        this.username = name;
+    }
+
 
         
     

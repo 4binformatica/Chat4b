@@ -9,7 +9,6 @@ import java.util.HashMap;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import java.util.Map;
 
 import com.google.gson.Gson;
 
@@ -357,6 +356,9 @@ public class Server extends WebSocketServer {
     public void manageOperation(Message msg) throws Exception{
         
         switch(msg.getOperation()){
+            // The above code is checking if the user is logged in. If the user is logged in, the user
+            // is added to the clients list. If the user is not logged in, the user is sent a message
+            // saying that the login failed.
             case "login":
                 if(login(msg.getUsername(), msg.getData())){
                     if(clients.get(msg.getUsername()) == null){
@@ -384,18 +386,24 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("login", msg.getUsername(), msg.getUsername(), "Login failed, wrong username or password"));
                 }
                 break;
+            // The above code is checking if the verification code exists in the database. If it does,
+            // it will remove the verification code from the database and add a login ID to the
+            // database. It will then send the login ID to the client. If the verification code does
+            // not exist, it will send a message to the client saying that the verification code is
+            // false.
             case "checkVerificationCode":
                 if(database.checkIfVerificationCodeExists(msg.getUsername(), msg.getData())){
                     database.removeVerificationCode(msg.getUsername(), msg.getData());
-                String loginID = generateLoginID(msg.getUsername());
-                database.addLoginID(msg.getUsername(), loginID);
-                sendTo(msg.getConn(), new Message("loginID", msg.getUsername(), msg.getUsername(), loginID));
+                database.addLoginID(msg.getUsername(), generateLoginID(msg.getUsername()));
+                sendTo(msg.getConn(), new Message("loginID", msg.getUsername(), msg.getUsername(), database.getLoginID(msg.getUsername())));
                 sendTo(msg.getConn(), new Message("checkVerificationCode", msg.getUsername(), msg.getUsername(), "success"));
                 database.removeVerificationCode(msg.getUsername(), msg.getData());
                 }else{
                     sendTo(msg.getConn(), new Message("checkVerificationCode", msg.getUsername(), msg.getUsername(), "false"));
                 }
                 break;
+            // The above code is checking if the loginID is outdated and if it is not generating a new
+            // one.
             case "checkLoginID":
                 //check if tje loginID is outdated not generate new one
                 if(database.checkLoginIDOutdated(msg.getUsername())
@@ -408,9 +416,12 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("checkLoginID", msg.getUsername(), msg.getUsername(), "false"));
                 }
                 break;
+            // Sending a message to a receiver.
             case "send":
                 sendTo(msg.getReceiver(), msg.getMessage());
                 break;
+            // Checking if the username is already in use, if not it will generate a verification code
+            // and send it to the user.
             case "register":
                 if(register(msg.getUsername(), msg.getData(), msg.getReceiver())){
                     String code = generateVerificateCode(msg.getUsername());
@@ -421,20 +432,32 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("register", msg.getUsername(), null, "Username already exists"));
                 }
                 break;
+            // Removing the login ID from the database and removing the client from the list of
+            // clients.
             case "logout":
                 database.removeLoginID(msg.getUsername());
                 clients.remove(msg.getUsername());
                 break;
-            
+            // The above code is checking if the user is logged in. If the user is logged in, the
+            // message is added to the database and sent to all the clients.
             case "message":
+                if(!database.validateLoginID(msg.getUsername())){
+                    return;
+                }
+                msg.setUserName(database.getUsernameByLoginID(msg.getUsername()));
                 database.addMessage(msg);
                 sendTo(msg);
                 break;
+            // Removing a message from the database.
             case "removeMessage":
                 database.removeMessageByDate(msg.getReceiver(), msg.getData());
                 sendReoload(msg.getReceiver());
                 break;
+           // The above code is adding a contact to the database.
             case "addContact":
+                if(!database.validateLoginID(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
                 if(database.userExist(msg.getData())){
                     if(msg.getData().equals(msg.getUsername())){
                         return;
@@ -447,12 +470,18 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("addContact", msg.getUsername(), msg.getData(), "User does not exist"));
                 }
                 break;
+            // Removing a contact from the database.
             case "removeContact":
                 database.removeContact(msg.getUsername(), msg.getData());
                 database.removeContact(msg.getData(), msg.getUsername());
                 sendReoload(msg.getData());
                 break;
+            // Getting the messages from the database and sending them to the client.
             case "getMessages":
+                if(!database.validateLoginID(msg.getUsername(), msg.getReceiver())){
+                    System.out.println("LoginID not valid");
+                    return;
+                }
                 ArrayList<Message> messages = database.getMessages(msg.getUsername());
                 System.out.println("Sending " + messages.size() + " messages to " + msg.getUsername());
                 for(Message m : messages){
@@ -467,27 +496,47 @@ public class Server extends WebSocketServer {
                     
                 }
                 break;
+            // The above code is getting the profile picture of the user.
             case "getProfilePic":
-                String profilePic = database.getProfilePic(msg.getUsername());
+                if(!database.validateLoginID(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
+                String profilePic = database.getProfilePic(msg.getData());
                 sendTo(msg.getConn(), new Message("profilePic", msg.getData(), msg.getUsername(), profilePic));
                 break;
+            // Getting the contacts of the user and sending them to the client.
             case "getContacts":
+                if(!database.validateLoginID(msg.getUsername(), msg.getData())){
+                    return;
+                }
                 ArrayList<String> contacts = database.getContacts(msg.getUsername());
                 for(String contact : contacts){
                     sendTo(msg.getConn(), new Message("contact", contact, msg.getUsername(), database.getProfilePic(contact)));                    
                 }
                 break;
+            // The above code is uploading an image to imgbb.com and then sending the image to the
+            // receiver.
             case "image":
+                if(!database.validateLoginID(msg.getUsername())){
+                    return;
+                }
                 ImgbbResponse imgbbResponse = uploadImage(msg.getData());
-                Message m = new Message("image", msg.getUsername(), msg.getReceiver(), imgbbResponse.getUrl());
+                String username = database.getUsernameByLoginID(msg.getUsername());
+                Message m = new Message("image", username, msg.getReceiver(), imgbbResponse.getUrl());
                 database.addImage(m);
                 sendTo(msg.getConn(), m);
                 sendTo(msg.getReceiver(), m);
                 break;
+            // The above code is uploading the image to imgbb.com and then changing the profile picture
+            // of the user.
             case "changeProfilePic":
+                if(!database.validateLoginID(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
                 ImgbbResponse imgbbResponse2 = uploadImage(msg.getData());
                 database.changeProfilePic(msg.getUsername(), imgbbResponse2.getUrl());
                 break;
+            // The above code is getting the draft from the database and sending it to the client.
             case "getDraft":
                 String draft = database.getDraft(msg.getUsername(), msg.getReceiver());
                 if(draft == null){
@@ -495,25 +544,35 @@ public class Server extends WebSocketServer {
                 }
                 sendTo(msg.getConn(), new Message("draft", msg.getUsername(), msg.getReceiver(), draft));
                 break;
+            // Creating a draft for the user.
             case "saveDraft":
                 database.createDraft(msg.getUsername(), msg.getData(), msg.getReceiver());
                 break;
+            // The above code is getting the bio of the user.
             case "getBio":
+                if(!database.validateLoginID(msg.getUsername(), msg.getReceiver())){
+                    return;
+                }
                 String bio = database.getBio(msg.getData());
                 if(bio == null){
                     bio = "";
                 }
                 sendTo(msg.getConn(), new Message("bio", msg.getUsername(), msg.getUsername(), bio));
                 break;
+            // Changing the bio of the user.
             case "changeBio":
                 database.changeBio(msg.getUsername(), msg.getData());
                 break;
+            // Calculating the time difference between the time the message was sent and the time the
+            // message was received.
             case "ping":
                 String t1 = msg.getDate();
                 String t2 = Instant.now().toString();
                 long diff = Instant.parse(t2).toEpochMilli() - Instant.parse(t1).toEpochMilli();
                 sendTo(msg.getConn(), new Message("pong", msg.getUsername(), msg.getUsername(), Long.toString(diff)));
                 break;
+            // The above code is checking if the email exists in the database. If it does, it will
+            // generate a forgot code and send it to the user.
             case "forgotPassword":
                 if(database.checkMailExists(msg.getData())){
                     if(database.checkIfForgotCodeAlreadyExists(msg.getData())){
@@ -527,6 +586,7 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("forgetPassword", msg.getUsername(), msg.getUsername(), "Mail does not exist"));
                 }
                 break;
+            // Checking if the code is correct.
             case "checkForgotCode":
                 if(database.checkForgotCode(msg.getData())){
                     sendTo(msg.getConn(), new Message("checkForgotCode", msg.getUsername(), msg.getUsername(), "success"));
@@ -535,8 +595,8 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("checkForgotCode", msg.getUsername(), msg.getUsername(), "Wrong code"));
                 }
                 break;
+            // Changing the password of the user with the given mail and code.
             case "changeForgotPassword":
-                
                 System.out.println("Changing password for " + msg.getUsername() + " to " + msg.getData());
                 String mail = msg.getUsername();
                 String code = msg.getReceiver();
@@ -548,6 +608,9 @@ public class Server extends WebSocketServer {
                 database.removeForgotCode(msg.getUsername());
                 sendTo(msg.getConn(), new Message("changeForgotPassword", msg.getUsername(), msg.getUsername(), "success"));
                 break;
+            // Checking if the mail exists in the database. If it does, it sends a message to the
+            // client saying that the mail already exists. If it doesn't, it changes the mail in the
+            // database and sends a message to the client saying that the change was successful.
             case "changeMail":
                 if(database.checkMailExists(msg.getData())){
                     sendTo(msg.getConn(), new Message("changeMail", msg.getUsername(), msg.getUsername(), "Mail already exists"));
@@ -556,6 +619,8 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("changeMail", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
+            // Checking if the user is an administrator. If the user is an administrator, it will
+            // generate an admin code and send it to the user.
             case "isAdministrator":
                 if(database.isAdministator(msg.getUsername())){
                     String adminCode = generateAdminCode(msg.getUsername());
@@ -566,6 +631,7 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("isAdministrator", msg.getUsername(), msg.getUsername(), "false"));
                 }
                 break;
+           // Verifying the admin code.
             case "verifyAdminCode":
                 if(database.verifyAdminCode(msg.getUsername(), msg.getData())){
                     sendTo(msg.getConn(), new Message("verifyAdminCode", msg.getUsername(), msg.getUsername(), "true"));
@@ -573,6 +639,7 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("verifyAdminCode", msg.getUsername(), msg.getUsername(), "false"));
                 }
                 break;
+            // Getting all the users from the database and sending them to the client.
             case "getAllUsers":
                 if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
                     System.out.println("User " + msg.getUsername() + " tried to get all users without admin rights");
@@ -585,12 +652,17 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("getAllUsers", user, database.getMail(user), database.getProfilePic(user)));
                 }
                 break;
+            // Deleting a user from the database.
             case "deleteUser":
                 if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
                     return;
                 }
                 database.removeUser(msg.getData());
                 break;
+            // Checking if the username exists in the database. If it does, it sends a message to the
+            // client saying that the username already exists. If it doesn't, it changes the username
+            // in the database and sends a message to the client saying that the username was changed
+            // successfully.
             case "changeUsername":
                 if(database.checkUsernameExists(msg.getData())){
                     sendTo(msg.getConn(), new Message("changeUsername", msg.getUsername(), msg.getUsername(), "Username already exists"));
@@ -599,6 +671,10 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("changeUsername", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
+            // Checking if the email exists in the database. If it does, it sends a message to the
+            // client saying that the email already exists. If it doesn't, it changes the email in the
+            // database and sends a message to the client saying that the email was changed
+            // successfully.
             case "changeEmail":
                 if(database.checkMailExists(msg.getData())){
                     sendTo(msg.getConn(), new Message("changeEmail", msg.getUsername(), msg.getUsername(), "Mail already exists"));
@@ -607,23 +683,25 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("changeEmail", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
+            // Deleting all users from the database.
             case "deleteAllUsers":
                 if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
                     return;
                 }
                 database.removeAllUsers();
                 break;
+            // Deleting all messages from the database.
             case "deleteAllMessages":
                 if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
                     return;
                 }
                 database.removeAllMessages();
                 break;
-            
+            // A switch statement that is checking the value of the variable "action". If the value of
+            // "action" is "keepAlive", then the code will break out of the switch statement.
             case "keepAlive":
                 break;
-
-
+            // The above code is creating a group.
             case "createGroup":
                 {
                     String groupName = msg.getData();
@@ -651,6 +729,7 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("createGroup", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
+            // The above code is adding a user to a group.
             case "addUserToGroup":
                 {
                     String groupName = msg.getData();
@@ -677,6 +756,7 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("addUserToGroup", msg.getUsername(), msg.getUsername(), "success"));
                 }                
                 break;
+            // The above code is removing a user from a group.
             case "removeUserFromGroup":
                 {
                     String groupName = msg.getData();
@@ -702,6 +782,7 @@ public class Server extends WebSocketServer {
                 }
                 
                 break;
+            // The above code is deleting a group.
             case "deleteGroup":
                 {
                     String groupName = msg.getData();
@@ -713,11 +794,10 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("deleteGroup", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
-
+            // A switch statement that is checking the operation of the message.
             default:
                 System.out.println("Unknown operation: " + msg.getOperation());
                 break;
-
         }
     }
 

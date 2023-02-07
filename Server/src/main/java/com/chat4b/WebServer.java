@@ -1,12 +1,8 @@
 package com.chat4b;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
 // NOTE: If you're using NanoHTTPD >= 3.0.0 the namespace is different,

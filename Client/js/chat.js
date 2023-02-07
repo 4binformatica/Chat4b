@@ -1,6 +1,8 @@
 let cancelMsg = false;
 let cancelContact = false;
 
+let contactImg;
+
 /* Opening a socket connection. */
 socket.onopen = function (event) {
     keepAlive();
@@ -71,7 +73,7 @@ let getContacts = () => {
         "operation": "getContacts",
         "username": getStoredValue("username"),
         "receiver": "server",
-        "data": "getContacts",
+        "data": getStoredValue("loginID"),
         "date": new Date().toISOString()
 
     }
@@ -85,10 +87,12 @@ let getContacts = () => {
  * @param name the name of the user you want to get messages from
  */
 let getMessages = (name) => {
+    getContactPic();
+    getYourPic();
     let message = {
         "operation": "getMessages",
         "username": getStoredValue("username"),
-        "receiver": "server",
+        "receiver": getStoredValue("loginID"),
         "data": name,
         "date": new Date().toISOString()
 
@@ -105,7 +109,7 @@ let addContact = () => {
     let message = {
         "operation": "addContact",
         "username": getStoredValue("username"),
-        "receiver": "server",
+        "receiver": getStoredValue("loginID"),
         "data": person,
         "date": new Date().toISOString()
     
@@ -146,8 +150,8 @@ let showProfilePic = (username1) => {
     let message = {
         "operation": "getProfilePic",
         "username": getStoredValue("username"),
-        "receiver": "server",
-        "data": username1,
+        "receiver": username1,
+        "data": getStoredValue("loginID"),
         "date": new Date().toISOString()
     }
     sendToServer(JSON.stringify(message));
@@ -165,7 +169,7 @@ let changeProfilePic = () => {
         let message = {
             "operation": "changeProfilePic",
             "username": getStoredValue("username"),
-            "receiver": "server",
+            "receiver": getStoredValue("loginID"),
             "data": base64Img,
             "date": new Date().toISOString()
         }
@@ -182,14 +186,14 @@ let changeProfilePic = () => {
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = async () => {
-        let receiver = getSelectedContactName();
         // convertire l'immagine in una stringa base64
         let base64Img = reader.result.split(',')[1];
         let messageObject = {
             "operation": "image",
-            "username": getStoredValue("username"),
+            "username": getStoredValue("loginID"),
             "receiver":  getSelectedContactName(),
-            "data": base64Img
+            "data": base64Img,
+            "date": new Date().toISOString()
         };
         sendToServer(JSON.stringify(messageObject));
         reloadMessages();
@@ -211,7 +215,7 @@ let sendMessage = async () => {
     let receiver = getSelectedContactName();
     let messageObject = {
         "operation": "message",
-        "username": getStoredValue("username"),
+        "username": getStoredValue("loginID"),
         "receiver": receiver,
         "data": message,
         "date": new Date().toISOString()
@@ -231,7 +235,7 @@ let getContactBio = () => {
     let message = {
         "operation": "getBio",
         "username": getStoredValue("username"),
-        "receiver": "server",
+        "receiver": getStoredValue("loginID"),
         "data": getSelectedContactName(),
         "date": new Date().toISOString()
     }
@@ -244,9 +248,20 @@ let getContactBio = () => {
 let getContactPic = () => {
     let message = {
         "operation": "getProfilePic",
-        "username": getSelectedContactName(),
-        "receiver": "server",
+        "username": getStoredValue("username"),
+        "receiver": getStoredValue("loginID"),
         "data": getSelectedContactName(),
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(message));
+}
+
+let getYourPic = () => {
+    let message = {
+        "operation": "getProfilePic",
+        "username": getStoredValue("username"),
+        "receiver": getStoredValue("loginID"),
+        "data": getStoredValue("username"),
         "date": new Date().toISOString()
     }
     sendToServer(JSON.stringify(message));
@@ -333,14 +348,33 @@ socket.addEventListener('message', (event) => {
                 //if the message isn't from the current user and the current user is neither the sender nor the receiver
                 if(username != getStoredValue("username") && getSelectedContactName() != username && getSelectedContactName() != receiver)
                      return;
+                getContactPic();
+                getYourPic();
                 var message = document.createElement('div');
+                var senderImage = document.createElement('img');
                 if(username == getStoredValue("username")){
                     message.className = "message-container sent";
+                    senderImage.className = "message-sender-image";
                 }else{
                     message.className = "message-container received";
+                    senderImage.className = "message-receiver-image";
+
                 }
-                message.innerHTML = data; 
-                message.date = date;
+                message.appendChild(senderImage);
+                var messageSender = document.createElement('p');
+                messageSender.className = "message-sender";
+                messageSender.innerHTML = username;
+                message.appendChild(messageSender);
+                var messageText = document.createElement('p');
+                messageText.className = "message-text";
+                messageText.innerHTML = data;
+                message.appendChild(messageText);
+                var messageDate = document.createElement('p');
+                messageDate.className = "message-date";
+                messageDate.innerHTML = date;
+                message.appendChild(messageDate);
+                
+
                 message.onclick = function() {
                     if(cancelMsg){
                         let message1 = {
@@ -396,12 +430,19 @@ socket.addEventListener('message', (event) => {
             document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
             break;
         case "getProfilePic":
-            var image = document.createElement('img');
-            image.src =  data;
-            image.width = 200;
-            image.height = 200;
-            
-            
+            if(username == getStoredValue("username")){
+                console.log("profile pic: " + data);
+                storeValue("profilePic", data);
+                for (let i = 0; i < document.getElementsByClassName("message-sender-image").length; i++) {
+                    document.getElementsByClassName("message-sender-image")[i].src = data;
+                }
+                return;
+            }
+            contactImg = data;
+            for (let i = 0; i < document.getElementsByClassName("message-receiver-image").length; i++) {
+                document.getElementsByClassName("message-receiver-image")[i].src = data;
+            }
+            break;
         case "contact":
             var contact = document.createElement('div');
             var name = document.createElement('div');
@@ -473,15 +514,19 @@ socket.addEventListener('message', (event) => {
             }
             break;
         case "profilePic":
-            if(document.getElementById("profilePic") != null)
-                document.getElementById("profilePic").remove();
-            var image = document.createElement('img');
-            image.id = "profilePic";
-            image.src =  data;
-            image.width = 100;
-            image.height = 100;
-            image.className = "contact-image";
-            document.getElementById("contactInfo").appendChild(image);
+            if(username === getStoredValue("username")){
+                console.log("profile pic: " + data);
+                storeValue("profilePic", data);
+                for (let i = 0; i < document.getElementsByClassName("message-sender-image").length; i++) {
+                    document.getElementsByClassName("message-sender-image")[i].src = data;
+                }
+                return;
+            }
+
+            contactImg = data;
+            for (let i = 0; i < document.getElementsByClassName("message-receiver-image").length; i++) {
+                document.getElementsByClassName("message-receiver-image")[i].src = data;
+            }
             break;
         case "bio":
             var bio = document.createElement('div');

@@ -5,13 +5,11 @@ package com.chat4b;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -831,6 +829,84 @@ public class Database {
     }
 
     /**
+     * > This function checks if the loginID is already in use by another user
+     * 
+     * @param username The username of the user who is trying to log in.
+     * @param loginID The login ID that the user is trying to use.
+     * @return A boolean value.
+     */
+    public boolean checkLoginID(String username, String loginID) throws SQLException{
+        String sql = "SELECT * FROM loginid WHERE username = ? AND loginid = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, loginID);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * If the loginID is valid, return true, otherwise return false
+     * 
+     * @param username The username of the user
+     * @param loginID The login ID that the user has entered.
+     * @return A boolean value.
+     */
+    public boolean validateLoginID(String username, String loginID) throws SQLException{
+        if(checkLoginID(username, loginID)){
+            if(checkLoginIDOutdated(username)){
+                removeLoginID(username);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * "If the loginID is in the database, and it's not outdated, then return true, otherwise return
+     * false."
+     * 
+     * The first thing we do is check if the loginID is in the database. If it is, then we check if
+     * it's outdated. If it's not outdated, then we return true. If it is outdated, then we remove it
+     * from the database and return false. If the loginID is not in the database, then we return false
+     * 
+     * @param loginID The loginID that is being validated.
+     * @return A boolean value.
+     */
+    public boolean validateLoginID(String loginID) throws SQLException{
+        if(checkLoginID(loginID)){
+            if(checkLoginIDOutdated(loginID)){
+                removeLoginID(loginID);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * "Given a loginID, return the username associated with it."
+     * 
+     * The function is written in Java, but the same principles apply to any language
+     * 
+     * @param loginID The login ID of the user
+     * @return The username of the user with the given loginID.
+     */
+    public String getUsernameByLoginID(String loginID) throws SQLException{
+        String sql = "SELECT username FROM loginid WHERE loginid = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, loginID);
+        ResultSet rs = pstmt.executeQuery();
+        if(rs.next()){
+            return rs.getString("username");
+        }
+        return null;
+    }
+
+    /**
      * It checks if the loginid is outdated
      * 
      * @param username The username of the user
@@ -1075,8 +1151,14 @@ public class Database {
 
 
 
+    /**
+     * This function checks if the user is an admin of the group
+     * 
+     * @param groupName the name of the group
+     * @param username the username of the user who is trying to join the group
+     * @return A boolean value.
+     */
     public boolean isAdminOfGroup(String groupName, String username) throws SQLException{
-        //check if user is admin of group
         String sql = "SELECT * FROM groups WHERE groupname = ? AND username = ? AND role = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
@@ -1089,8 +1171,14 @@ public class Database {
         return false;
     }
 
+    /**
+     * This function checks if a user is in a group
+     * 
+     * @param groupName the name of the group
+     * @param username the username of the user you want to check if they are in the group
+     * @return A boolean value.
+     */
     public boolean isInGroup(String groupName, String username) throws SQLException{
-        //check if user is in group
         String sql = "SELECT * FROM groups WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
@@ -1102,8 +1190,13 @@ public class Database {
         return false;
     }
 
+    /**
+     * It adds a user to a group
+     * 
+     * @param groupName the name of the group
+     * @param username the username of the user to be added to the group
+     */
     public void addUserToGroup(String groupName, String username) throws SQLException{
-        //add user to group
         if(!userExist(username) || isInGroup(groupName, username)){
             return;
         }
@@ -1115,8 +1208,13 @@ public class Database {
         pstmt.executeUpdate();
     }
 
+    /**
+     * Remove a user from a group.
+     * 
+     * @param groupName The name of the group you want to remove the user from.
+     * @param username The username of the user you want to remove from the group.
+     */
     public void removeUserFromGroup(String groupName, String username) throws SQLException{
-        //remove user from group
         String sql = "DELETE FROM groups WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
@@ -1124,8 +1222,13 @@ public class Database {
         pstmt.executeUpdate();        
     }
 
+    /**
+     * Set the role of the user with the given username to admin in the group with the given groupname.
+     * 
+     * @param groupName the name of the group
+     * @param username the username of the user you want to set as admin
+     */
     public void setGroupAdmin(String groupName, String username) throws SQLException{
-        //set user as admin of group
         String sql = "UPDATE groups SET role = ? WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, "admin");
@@ -1134,8 +1237,13 @@ public class Database {
         pstmt.executeUpdate();
     }
 
+    /**
+     * Revoke admin rights from a user in a group
+     * 
+     * @param groupName the name of the group
+     * @param username the username of the user to be revoked
+     */
     public void revokeGroupAdmin(String groupName, String username) throws SQLException{
-        //revoke admin rights from user
         String sql = "UPDATE groups SET role = ? WHERE groupname = ? AND username = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, "member");
@@ -1144,8 +1252,13 @@ public class Database {
         pstmt.executeUpdate();        
     }
 
+    /**
+     * > This function checks if a group exists in the database
+     * 
+     * @param groupName The name of the group you want to check if it exists.
+     * @return A boolean value.
+     */
     public boolean checkIfGroupExists(String groupName) throws SQLException{
-        //check if group exists
         String sql = "SELECT * FROM groups WHERE groupname = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
@@ -1156,8 +1269,12 @@ public class Database {
         return false;
     }
 
+    /**
+     * Delete a group from the database.
+     * 
+     * @param groupName The name of the group to be deleted
+     */
     public void deleteGroup(String groupName) throws SQLException{
-        //delete group
         String sql = "DELETE FROM groups WHERE groupname = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);

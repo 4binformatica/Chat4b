@@ -3,6 +3,7 @@ let firstClick2 = false;
 let mail = "";
 let code = "";
 let username = "";
+let loginID = "";
 
 socket.onopen = function() {
     isLogged();
@@ -192,6 +193,7 @@ socket.onmessage = function(event) {
 
     switch(operation) {
         case "loginID":
+            this.loginID = data;
             deleteStoredValue("loginID");
             storeValue("loginID", data);
             deleteStoredValue("username");
