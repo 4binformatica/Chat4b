@@ -535,6 +535,30 @@ socket.addEventListener('message', (event) => {
             document.getElementById("contactInfo").appendChild(bio);
             break;
         default:
-            console.log(data);
+            console.table(data);
     }
+ 
 });
+
+let createGroup = function() {
+    let createGroup = {
+        "operation": "createGroup",
+        "username": getStoredValue("username"),
+        "receiver": "",
+        "data": "",
+        "date": new Date().toISOString()
+    }
+    createGroup.data = prompt("Inserisci il nome del gruppo");
+    let members = [];
+    let string;
+    do{
+        string = prompt("Inserisci il nome del membro");
+        members.push(string);
+    }while(string !== null && string !== "");
+    
+    createGroup.receiver = members.toString();
+    console.table(createGroup);
+    string = JSON.stringify(createGroup);
+    socket.send(string);
+}
+
