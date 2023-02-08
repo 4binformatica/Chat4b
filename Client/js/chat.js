@@ -557,8 +557,6 @@ let createGroup = function() {
     }while(string !== null && string !== "");
     
     createGroup.receiver = members.toString();
-    console.table(createGroup);
-    string = JSON.stringify(createGroup);
-    socket.send(string);
+    sendToServer(JSON.stringify(createGroup));
 }
 
