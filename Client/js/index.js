@@ -11,7 +11,15 @@ socket.onopen = function() {
 
 //run isLofged() when the page is loaded after 1 second
 window.onload = function() {
-    writing(["ciao", "bella"], document.getElementById("writer"));
+    writeArray(["Seamless chat experience.",
+    "Effortless communication.",
+    "Real-time messaging.",
+    "Smart chat solution.",
+    "Streamlined communication.",
+    "Chat revolution.",
+    "Powerful chat tool.",
+    "Clutter-free chatting.",
+    "Stay in touch, easily."], document.getElementById("writer"), 600, 1000);
     setTimeout(isLogged, 1000);
     createInput("text", "username", "Your username...", "user", "input_cont");
     createInput("password", "password", "Your password...", "pass", "input_cont");

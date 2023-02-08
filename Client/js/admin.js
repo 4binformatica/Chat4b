@@ -7,95 +7,95 @@ socket.onopen = function() {
 }
 
 let isAdministrator = () => {
-    mesagge = {
+    message = {
         "operation" : "isAdministrator",
         "username": getStoredValue("username"),
         "receiver": "Server",
         "data": null,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let sendAdminCode = () => {
     let code = document.getElementById("adminCode").value;
-    mesagge = {
+    message = {
         "operation" : "verifyAdminCode",
         "username": getStoredValue("username"),
         "receiver": "Server",
         "data": code,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let getAllUsers = () => {
-    mesagge = {
+    message = {
         "operation" : "getAllUsers",
         "username": getStoredValue("username"),
         "receiver": getStoredValue("adminCode"),
         "data": null,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let deleteUser = (username) => {
-    mesagge = {
+    message = {
         "operation" : "deleteUser",
         "username": getStoredValue("username"),
         "receiver": getStoredValue("adminCode"),
         "data": username,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let changeUsername = (username) => {
     let newUsername = prompt("Enter new username");
-    mesagge = {
+    message = {
         "operation" : "changeUsername",
         "username": getStoredValue("username"),
         "receiver": getStoredValue("adminCode"),
         "data": newUsername,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let changeEmail = (username) => {
     let newEmail = prompt("Enter new email");
-    mesagge = {
+    message = {
         "operation" : "changeEmail",
         "username": getStoredValue("username"),
         "receiver": getStoredValue("adminCode"),
         "data": newEmail,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 
 let deleteAllUsers = () => {
-    mesagge = {
+    message = {
         "operation" : "deleteAllUsers",
         "username": getStoredValue("username"),
         "receiver": getStoredValue("adminCode"),
         "data": null,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let deleteAllMessages = () => {
-    mesagge = {
+    message = {
         "operation" : "deleteAllMessages",
         "username": getStoredValue("username"),
         "receiver": getStoredValue("adminCode"),
         "data": null,
         "date": new Date().toISOString()
     }
-    socket.send(JSON.stringify(mesagge));
+    socket.send(JSON.stringify(message));
 }
 
 let logout = () => {
