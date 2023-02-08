@@ -4,29 +4,31 @@ let mail = "";
 let code = "";
 let username = "";
 let loginID = "";
+let motivationalPhrases = [];
 
 socket.onopen = function() {
+    console.log("Connection established");
+    getMotivationalPhrases();
     isLogged();
+
+}
+
+let getMotivationalPhrases = () => {
+    let message = {
+        "operation": "getMotivationalPhrases"
+    }
+    socket.send(JSON.stringify(message));
 }
 
 //run isLofged() when the page is loaded after 1 second
 window.onload = function() {
-    writeArray(["Seamless chat experience.",
-    "Effortless communication.",
-    "Real-time messaging.",
-    "Smart chat solution.",
-    "Streamlined communication.",
-    "Chat revolution.",
-    "Powerful chat tool.",
-    "Clutter-free chatting.",
-    "Stay in touch, easily."], document.getElementById("writer"), 600, 1000);
-    setTimeout(isLogged, 1000);
     createInput("text", "username", "Your username...", "user", "input_cont");
     createInput("password", "password", "Your password...", "pass", "input_cont");
     createButton("login_button", "Login", login, "btn btn-white btn-animation", "button_cont");
     createButton("register_button", "Register", register, "btn btn-white btn-animation", "button_cont");
     createButton("password_reset_button", "Password reset", passwordReset, "btn btn-white btn-animation", "button_cont");
 }
+
 
 
 
@@ -191,9 +193,6 @@ let createButton = (id, text, onclick, className, parent) => {
 }
 
 
-socket.onopen = function() {
-    console.log("Connection established!");
-}
 
 /* Listening for a message from the server. */
 socket.onmessage = function(event) {
@@ -286,8 +285,13 @@ socket.onmessage = function(event) {
                 alert(data);
             }
             break;
+        case "getMotivationalPhrases":
+            let phrases = fromStringToArray(data);
+            writeArray(phrases, document.getElementById("writer"), 600, 1000);
+            break;
+
         default:
-            console.log(data);
+            console.log(event.data);
             
     }
 }

@@ -222,6 +222,21 @@ public class Database {
         }
     }
 
+    
+    public void createMotivationalPhrasesTable() throws SQLException{
+        String sql = "CREATE TABLE IF NOT EXISTS motivationalphrases (\n"
+                + " phrase text \n"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            // create a new table
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     /**
      * It takes 4 strings as parameters and inserts them into the database
      * 
@@ -1278,6 +1293,25 @@ public class Database {
         String sql = "DELETE FROM groups WHERE groupname = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setString(1, groupName);
+        pstmt.executeUpdate();
+    }
+    
+
+    public ArrayList<String> getMotivationalPhrases() throws SQLException{
+        ArrayList<String> phrases = new ArrayList<String>();
+        String sql = "SELECT * FROM motivationalphrases";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        while(rs.next()){
+            phrases.add(rs.getString("phrase"));
+        }
+        return phrases;
+    }
+    
+    public void addMotivationalPhrase(String phrase) throws SQLException{
+        String sql = "INSERT INTO motivationalphrases(phrase) VALUES(?)";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, phrase);
         pstmt.executeUpdate();
     }
     

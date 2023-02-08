@@ -63,6 +63,7 @@ public class Server extends WebSocketServer {
         database.createAdminCodeTable();
         database.createMailVerificationTable();
         database.createGroupTable();
+        database.createMotivationalPhrasesTable();
 	}
 
     /**
@@ -794,6 +795,23 @@ public class Server extends WebSocketServer {
                     sendTo(msg.getConn(), new Message("deleteGroup", msg.getUsername(), msg.getUsername(), "success"));
                 }
                 break;
+
+            case "getMotivationalPhrases":
+                {
+                    ArrayList<String> phrases = database.getMotivationalPhrases();
+                    sendTo(msg.getConn(), new Message("getMotivationalPhrases", msg.getUsername(), msg.getUsername(), phrases.toString()));
+                }
+                break;
+            case "addMotivationalPhrase":
+                {
+                    //check if admin
+                    if(!database.isAdministator(msg.getUsername()) || !database.verifyAdminCode(msg.getUsername(), msg.getReceiver())){
+                        return;
+                    }
+                    String phrase = msg.getData();
+                    database.addMotivationalPhrase(phrase);
+                    sendTo(msg.getConn(), new Message("addMotivationalPhrase", msg.getUsername(), msg.getUsername(), "success"));
+                }
             // A switch statement that is checking the operation of the message.
             default:
                 System.out.println("Unknown operation: " + msg.getOperation());
