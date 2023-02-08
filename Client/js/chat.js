@@ -327,6 +327,31 @@ let deteleContact = () => {
     }
 }
 
+let createGroup = function() {
+    let message = {
+        "operation" : "createGroup",
+        "username" : getStoredValue("username"),
+        "receiver" : "[Toto, Pippo, Pluto]",
+        "data": "Minnie",
+        "date" : new Date().toISOString()
+    }
+    createGroup.data = prompt("Enter the name of the group");
+    let members= [];
+    let string;
+    do{
+        string = prompt("Enter the name of the group");
+        members.push(string);
+        
+    }while(string !== null && string !== "");
+    createGroup.receiver = members.toString();
+    console.table(createGroup);
+    string = JSON.stringify(createGroup);
+    socket.send(string);
+    
+}
+/* let string = JSON.stringify(createGroup);
+socket.send(string); */
+
 
 
 /* The above code is listening for messages from the server. When a message is received, the code
