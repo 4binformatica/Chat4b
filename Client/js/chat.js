@@ -222,6 +222,15 @@ let sendMessage = async () => {
     }
 
     sendToServer(JSON.stringify(messageObject));
+
+    let messageDraft = {
+        "operation": "saveDraft",
+        "username": getStoredValue("username"),
+        "receiver": getStoredValue("loginID"),
+        "data": "",
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(messageDraft));
     document.getElementById("message-input").value = ""
     document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
     reloadMessages();
@@ -351,27 +360,36 @@ socket.addEventListener('message', (event) => {
                 getContactPic();
                 getYourPic();
                 var message = document.createElement('div');
+                var messageDiv = document.createElement('div');
                 var senderImage = document.createElement('img');
+                var messageSender = document.createElement('p');
+                var messageText = document.createElement('p');
+                var messageDate = document.createElement('p');
                 if(username == getStoredValue("username")){
                     message.className = "message-container sent";
                     senderImage.className = "message-sender-image";
+                    messageSender.className = "message-sender";
+                    messageText.className = "message-text-sent";
+                    messageDate.className = "message-date-sent";
+                    messageDiv.className = "message-div-sent";
                 }else{
                     message.className = "message-container received";
                     senderImage.className = "message-receiver-image";
-
+                    messageSender.className = "message-receiver";
+                    messageText.className = "message-text-received";
+                    messageDate.className = "message-date-received";
+                    messageDiv.className = "message-div-received";
                 }
+                messageDiv.appendChild(messageText);
                 message.appendChild(senderImage);
-                var messageSender = document.createElement('p');
-                messageSender.className = "message-sender";
                 messageSender.innerHTML = username;
                 message.appendChild(messageSender);
-                var messageText = document.createElement('p');
-                messageText.className = "message-text";
+                message.appendChild(messageDiv);
                 messageText.innerHTML = data;
-                message.appendChild(messageText);
-                var messageDate = document.createElement('p');
-                messageDate.className = "message-date";
-                messageDate.innerHTML = date;
+                var date = new Date(date);
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                messageDate.innerHTML = hours + ":" + minutes;
                 message.appendChild(messageDate);
                 
 

@@ -1,16 +1,16 @@
 :root {
-    --red-crayola: #ed254eff;
-    --naples-yellow: #f9dc5cff;
-    --mint-cream: #f4fffdff;
-    --oxford-blue: #011936ff;
-    --black-coral: #465362ff;
+    --celestial-blue: #3e92ccff;
+    --lapis-lazuli: #2a628fff;
+    --prussian-blue: #13293dff;
+    --prussian-blue-2: #16324fff;
+    --indigo-dye: #18435aff;
     --sfondo: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(255,0,49,1) 100%);
     --font: -apple-system, BlinkMacSystemFont, sans-serif;
 
 }
 
 body {
-    background: var(--sfondo);
+    background: var(--prussian-blue-2);
     overflow-x: hidden;
 }
 
@@ -30,7 +30,7 @@ div.title {
 
 h1.title {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--mint-cream);
+    color: var(--l);
     font-size: 5vw;
     animation: slideInLeft;
     animation-duration: 2s;

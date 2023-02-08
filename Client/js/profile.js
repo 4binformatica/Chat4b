@@ -22,6 +22,7 @@ let profilePicClicked = function() {
     }
 }
 
+
 let editMailButton = function() {
     let saveButton = document.getElementById("saveMail");
     saveButton.style.display = "inline-block";
@@ -160,7 +161,7 @@ let changeMail = function() {
 }
 
 let changePassword = function() {
-    let password = document.getElementById("password").innerText;
+    let password = document.getElementById("pass").innerText;
     let message = {
         "operation": "changePassword",
         "username": getStoredValue("username"),
@@ -190,4 +191,10 @@ socket.onmessage = function(event) {
         default:
             break;
     }
+
+    
+}
+
+let fontChanged = () => {
+    console.log("hello");
 }

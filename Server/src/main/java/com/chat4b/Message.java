@@ -20,6 +20,7 @@ public class Message {
     private String receiver;
     private String data;
     private String date;
+    private String clientInfo;
     private WebSocket conn;
 
 
