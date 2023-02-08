@@ -11,6 +11,7 @@ socket.onopen = function() {
 
 //run isLofged() when the page is loaded after 1 second
 window.onload = function() {
+    writing(["ciao", "bella"], document.getElementById("writer"));
     setTimeout(isLogged, 1000);
     createInput("text", "username", "Your username...", "user", "input_cont");
     createInput("password", "password", "Your password...", "pass", "input_cont");
@@ -18,6 +19,8 @@ window.onload = function() {
     createButton("register_button", "Register", register, "btn btn-white btn-animation", "button_cont");
     createButton("password_reset_button", "Password reset", passwordReset, "btn btn-white btn-animation", "button_cont");
 }
+
+
 
 
 /**

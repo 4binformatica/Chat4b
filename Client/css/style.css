@@ -15,11 +15,11 @@ body {
 }
 
 div.container-1 {
-    /* border: 3px solid red;  */
+    border: 3px solid red; 
     position: relative;
     top: 100px;
+    left: 50px;
     height: auto;
-    text-align: center;
 }
 
 div.title {
@@ -30,24 +30,20 @@ div.title {
 
 h1.title {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--l);
-    font-size: 5vw;
-    animation: slideInLeft;
-    animation-duration: 2s;
+    color: var(--lapis-lazuli);
+    font-size: 100px;
 }
 
 div.subtitle {
     position: relative;
-    bottom: 25px;
+    bottom: 50px;
 }
 
 h3.sub {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--mint-cream);
-    opacity: 50%;
-    font-size: 1.5vw;
-    animation: slideInRight;
-    animation-duration: 2s;
+    color: var(--lapis-lazuli);
+    opacity: 80%;
+    font-size: 50px;
 }
 
 
@@ -66,8 +62,6 @@ input.user {
     border-color: var(--mint-cream);
     font-size: 25px;
     color: var(--mint-cream);
-    animation: fadeInLeft;
-    animation-duration: 2.5s;
 }
 
 input.pass {
@@ -76,83 +70,41 @@ input.pass {
     border-color: var(--mint-cream);
     font-size: 25px;
     color: var(--mint-cream);
-    animation: fadeInRight;
-    animation-duration: 2.5s;
 }
 
-.button-login{
-    position:relative;
-    transform : translate(-50% ,-50%);
-    left: 50%;
-    top: 170px;
-    animation: fadeIn;
-    animation-duration: 3s;
-  }
-  
-  .btn:link, 
-  .btn:visited{
-    text-decoration: none;
-    text-transform:uppercase;
-    position:relative;
-    top:0;
-    left:0;
-    padding:20px 40px;
-    border-radius:100px;
-    display:inline-block;
-    transition: all .5s;
-  }
-  
-  .btn-white{
-    background:var(--mint-cream);
-    color:var(--black-coral);
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  }
-  
-  .btn:hover{
-     box-shadow:0px 10px 10px rgba(0,0,0,0.2);
-     transform : translateY(-3px);
-  }
-  
-  .btn:active{
-    box-shadow:0px 5px 10px rgba(0,0,0,0.2); 
-    transform:translateY(-1px);
-  }
-  
-  .btn-bottom-animation{
-    animation:comeFromBottom 1s ease-out .8s;
-  }
-  
-  .btn::after{
-    content:"";
-    text-decoration: none;
-    text-transform:uppercase;
-    position:absolute;
-    width:100%;
-    height:100%;
-    top:0;
-    left:0;
-    border-radius:100px;
-    display:inline-block;
-    z-index:-1;
-    transition: all .5s;
-  }
-  
-  .btn-white::after {
-      background: var(--mint-cream);
-  }
-  
-  .btn-animation:hover::after {
-      transform: scaleX(1.4) scaleY(1.6);
-      opacity: 0;
-  }
-  
-  @keyframes comeFromBottom{
-    0%{
-      opacity:0;
-      transform:translateY(40px);
-    } 
-    100%{
-      opacity:1;
-      transform:translateY(0);
-    }
-  }
+/* #typewriter {
+  border-right: 1px solid currentColor;
+  animation: blink 0.5s linear infinite;
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+ */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typewriter {
+  --caret: currentcolor;
+}
+
+.typewriter::before {
+  content: "";
+  animation: typing 13.5s infinite;
+}
+
+.typewriter::after {
+  content: "";
+  border-right: 1px solid var(--caret);
+  animation: blink 0.5s linear infinite;
+}
+
+.typewriter.thick::after {
+  border-right: 1ch solid var(--caret);
+}
+
+.typewriter.nocaret::after {
+  border-right: 0;
+}
+
