@@ -354,6 +354,17 @@ div.small-title {
     top: 15px;
   }
 
+  button.createGroup-button {
+    padding: 10px;
+    position: relative;
+    width: 5vw;
+    border-radius: 10px;
+    background-color: #011936;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    top: 15px;
+  }
   
   .contact-name {
     display: flex;
