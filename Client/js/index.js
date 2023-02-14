@@ -6,12 +6,18 @@ let username = "";
 let loginID = "";
 let motivationalPhrases = [];
 
-socket.onopen = function() {
+socket.onopen = async function() {
     console.log("Connection established");
     getMotivationalPhrases();
     isLogged();
-
+    //wait 2 second and writeArray(motivationalPhrases, document.getElementById("writer"), 600, 1000);
+    //ma usare il setTimeout invece di await sleep(2000);
+    
+    await sleep(2000);
+    writeArray(motivationalPhrases, document.getElementById("writer"), 600, 1000);
 }
+
+
 
 let getMotivationalPhrases = () => {
     let message = {
@@ -286,8 +292,9 @@ socket.onmessage = function(event) {
             }
             break;
         case "getMotivationalPhrases":
-            let phrases = fromStringToArray(data);
-            writeArray(phrases, document.getElementById("writer"), 600, 1000);
+            motivationalPhrases.push(data);
+            //console.log(motivationalPhrases);
+            //writeArray(motivationalPhrases, document.getElementById("writer"), 600, 1000);
             break;
 
         default:

@@ -98,7 +98,7 @@ let getProfilePic = function() {
     message = {
         "operation": "getProfilePic",
         "username": getStoredValue("username"),
-        "recevier": getStoredValue("username"),
+        "recevier": getStoredValue("loginID"),
         "data": "",
         "date": new Date().getTime()
 
@@ -113,7 +113,7 @@ let getBio = function() {
     message = {
         "operation": "getBio",
         "username": getStoredValue("username"),
-        "recevier": getStoredValue("username"),
+        "recevier": getStoredValue("loginID"),
         "data": getStoredValue("username"),
         "date": new Date().getTime()
 

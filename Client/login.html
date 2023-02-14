@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/login.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/connection.js"></script>
+    <script src="js/cookie.js"></script>
+    <script src="js/instruction.js"></script>
+    <script src="js/login.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://example.com/fontawesome/v5.15.4/js/all.js" data-auto-a11y="true" ></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <title>Chat4B</title>
+</head>
+<body>
+    <div class="container" id="container1">
+        <div class="login" data-aos="fade-right" data-aos-duration="1500">
+            <div class="login-header">
+                <a class="backIndex" href="index.html"><h1 class="login-title">Chat4B</h1></a>
+            </div>
+            <div class="login-body">
+                <div class="login-body-form">
+                    <div class="login-body-form-input">
+                        <input class="inputUser" type="text" id="username" placeholder="Username">
+                    </div>
+                    <br>
+                    <div class="login-body-form-input">
+                        <input class="inputPass" type="password" id="password" placeholder="Password">
+                    </div>
+                    <div class="login-body-form-input">
+                        <button class="btnLogin" id="login" onclick="login()">Login</button>
+                    </div>
+                </div>
+                <div class="login-body-register">
+                    <p class="pRegister">Don't have an account? <a class="aRegister" href="#container2">Register</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br><br>
+    <div class="container2" id="container2">
+        <div class="register" data-aos="fade-left" data-aos-duration="1500">
+            <div class="register-header">
+                <a class="backIndex" href="index.html"><h1 class="register-title">Chat4B</h1></a>
+            </div>
+            <div class="register-body">
+                <div class="register-body-form">
+                    <div class="register-body-form-input">
+                        <input class="inputUser" type="text" id="regUsername" placeholder="Username">
+                    </div>
+                    <br>
+                    <div class="register-body-form-input">
+                        <input class="inputEmail" type="email" id="regEmail" placeholder="Email">
+                    </div>
+                    <br>
+                    <div class="register-body-form-input">
+                        <input class="confEmail" type="email" id="confEmail" placeholder="Confirm Email">
+                    </div>
+                    <br>
+                    <div class="register-body-form-input">
+                        <input class="inputPass" type="password" id="regPassword" placeholder="Password">
+                    </div>
+                    <br>
+                    <div class="register-body-form-input">
+                        <input class="confPass" type="password" id="confPassword" placeholder="Confirm Password">
+                    </div>
+                    <div class="register-body-form-input">
+                        <button class="btnRegister" id="register" onclick="register()">Register</button>
+                    </div>
+                </div>
+                <div class="register-body-login">
+                    <p class="pLogin">Already have an account? <a class="aLogin" href="#container1">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br><br>
+    <div class="container3" id="container3" data-aos="flip-up" data-aos-duration="1500">
+        <div class="verificationCode">
+            <div class="verificationCode-header">
+                <h1 class="login-title">Check the code</h1>
+            </div>
+            <div class="verification-body">
+                <div class="verification-body-form">
+                    <div class="verification-body-form-input">
+                        <input class="inputCheck" type="text" id="checkCodeInput" placeholder="Verification code">
+                    </div>
+                    <br>
+                    <div class="verification-body-form-button">
+                        <button class="btnCheck" id="checkCode" onclick="checkVerificationCode()">Check Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    AOS.init();
+  </script>
+</html>

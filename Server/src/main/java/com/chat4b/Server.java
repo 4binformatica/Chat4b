@@ -799,7 +799,9 @@ public class Server extends WebSocketServer {
             case "getMotivationalPhrases":
                 {
                     ArrayList<String> phrases = database.getMotivationalPhrases();
-                    sendTo(msg.getConn(), new Message("getMotivationalPhrases", msg.getUsername(), msg.getUsername(), phrases.toString()));
+                    for(String phrase : phrases){
+                        sendTo(msg.getConn(), new Message("getMotivationalPhrases", msg.getUsername(), msg.getUsername(), phrase));
+                    }
                 }
                 break;
             case "addMotivationalPhrase":

@@ -15,7 +15,7 @@ body {
 }
 
 div.container-1 {
-    border: 3px solid red; 
+    /* border: 3px solid red;  */
     position: relative;
     top: 100px;
     left: 50px;
@@ -31,12 +31,12 @@ div.title {
 h1.title {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--lapis-lazuli);
-    font-size: 100px;
+    font-size: 80px;
 }
 
 div.subtitle {
     position: relative;
-    bottom: 50px;
+    bottom: 40px;
 }
 
 h3.sub {
@@ -46,30 +46,31 @@ h3.sub {
     font-size: 50px;
 }
 
-
-div.user-pass {
-    /* border: 1px solid red; */
+.btn-container {
     position: relative;
-    margin: 0 auto;
+    width: auto;
     height: auto;
-    width: 315px;
-    line-height: 45px;
+    /* border: 3px solid red; */
+
 }
 
-input.user {
-    background: var(--oxford-blue);
-    border-radius: 9999em;
-    border-color: var(--mint-cream);
-    font-size: 25px;
-    color: var(--mint-cream);
+.btn-begin {
+    width: 200px;
+    height: 50px;
+    background-color: var(--celestial-blue);
+    border: 0;
+    border-radius: 10px;
+    color: var(--prussian-blue);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-input.pass {
-    background: var(--oxford-blue);
-    border-radius: 9999em;
-    border-color: var(--mint-cream);
-    font-size: 25px;
-    color: var(--mint-cream);
+.btn-begin:hover {
+    background-color: var(--lapis-lazuli);
+    color: var(--prussian-blue);
 }
 
 /* #typewriter {
@@ -107,4 +108,5 @@ input.pass {
 .typewriter.nocaret::after {
   border-right: 0;
 }
+
 
