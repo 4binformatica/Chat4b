@@ -1,0 +1,59 @@
+:root {
+    --celestial-blue: #3e92ccff;
+    --lapis-lazuli: #2a628fff;
+    --prussian-blue: #13293dff;
+    --prussian-blue-2: #16324fff;
+    --indigo-dye: #18435aff;
+    --sfondo: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(255,0,49,1) 100%);
+    --font: -apple-system, BlinkMacSystemFont, sans-serif;
+
+}
+
+body {
+    background: var(--prussian-blue-2);
+    overflow-x: hidden;
+}
+
+.container {
+    /* border: 3px solid red;  */
+    position: relative;
+    top: 100px;
+    left: 50px;
+    height: auto;
+}
+
+.titleError {
+    font-family: var(--font);
+    color: var(--lapis-lazuli);
+    font-size: 150px;
+}
+
+.subtitleError {
+    font-family: var(--font);
+    color: var(--lapis-lazuli);
+    opacity: 80%;
+    position: relative;
+    font-size: 40px;
+    bottom: 40px;
+}
+
+.btn-container {
+    position: relative;
+}
+
+.btn-home {
+    background: var(--celestial-blue);
+    color: var(--prussian-blue);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-home:hover {
+    background: var(--lapis-lazuli);
+}
