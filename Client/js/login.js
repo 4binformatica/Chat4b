@@ -1,4 +1,4 @@
-
+var activeContainer = "container1";
 
 let login = function () {
     username = document.getElementById("username").value;
@@ -51,6 +51,35 @@ let checkVerificationCode = () => {
     sendToServer(JSON.stringify(message));
 }
 
+let changeCointainer = (container) => {
+    activeContainer = container;
+    container = document.getElementById(container);
+    scrollToElement(container);
+}
+
+$(document).keyup(function(event) {
+    if (event.key == "Enter") {
+        console.log("enter");
+        // Get the id of the focused element
+        console.log(activeContainer);
+        switch (activeContainer) {
+            case "container1":
+                console.log("login");
+                login();
+                break;
+            case "container2":
+                register();
+                break;
+            case "container3":
+                checkVerificationCode();
+                break;
+            default:
+                console.log("default");
+                break;
+        }
+    }
+});
+
 /* Listening for a message from the server. */
 socket.onmessage = function(event) {
     let operation = JSON.parse(event.data).operation;
@@ -67,7 +96,7 @@ socket.onmessage = function(event) {
             storeValue(document.getElementById("username").value, username);
             break;
         case "needVerification":
-            console.log("ci sono");
+            activeContainer = "container3";
             var verification = document.getElementById("container3");
             //scrool to container3
             verification.scrollIntoView();

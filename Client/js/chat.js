@@ -13,7 +13,7 @@ socket.onopen = function (event) {
 };
 
 
-$(document).keyup(function(event) {
+$(document).keyup(function (event) {
     if ($(".chat-input").is(":focus") && event.key == "Enter") {
         sendMessage();
     }
@@ -112,7 +112,7 @@ let addContact = () => {
         "receiver": getStoredValue("loginID"),
         "data": person,
         "date": new Date().toISOString()
-    
+
     }
     sendToServer(JSON.stringify(message));
     reloadContacts();
@@ -178,10 +178,10 @@ let changeProfilePic = () => {
     }
 }
 
-  /**
-   * It takes an image from the input, converts it to base64 and sends it to the server.
-   */
-  let sendImage = async () => {
+/**
+ * It takes an image from the input, converts it to base64 and sends it to the server.
+ */
+let sendImage = async () => {
     let image = document.getElementById("image-input").files[0];
     let reader = new FileReader();
     reader.readAsDataURL(image);
@@ -191,7 +191,7 @@ let changeProfilePic = () => {
         let messageObject = {
             "operation": "image",
             "username": getStoredValue("loginID"),
-            "receiver":  getSelectedContactName(),
+            "receiver": getSelectedContactName(),
             "data": base64Img,
             "date": new Date().toISOString()
         };
@@ -199,7 +199,7 @@ let changeProfilePic = () => {
         reloadMessages();
     }
 }
-  
+
 
 /**
  * It takes the message from the input field, gets the selected contact name, creates a message object,
@@ -207,12 +207,22 @@ let changeProfilePic = () => {
  * 
  * @return the value of the variable message.
  */
-let sendMessage = async () => {   
+let sendMessage = async () => {
     let message = document.getElementById("message-input").value;
-    if(message == ""){
+    if (message == "") {
         return;
     }
     let receiver = getSelectedContactName();
+    let messageDraft = {
+        "operation": "saveDraft",
+        "username": getStoredValue("loginID"),
+        "receiver": receiver,
+        "data": "",
+        "date": new Date().toISOString()
+    }
+    sendToServer(JSON.stringify(messageDraft));
+    document.getElementById("message-input").value = ""
+    document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
     let messageObject = {
         "operation": "message",
         "username": getStoredValue("loginID"),
@@ -222,18 +232,7 @@ let sendMessage = async () => {
     }
 
     sendToServer(JSON.stringify(messageObject));
-
-    let messageDraft = {
-        "operation": "saveDraft",
-        "username": getStoredValue("username"),
-        "receiver": getStoredValue("loginID"),
-        "data": "",
-        "date": new Date().toISOString()
-    }
-    sendToServer(JSON.stringify(messageDraft));
-    document.getElementById("message-input").value = ""
-    document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
-    reloadMessages();
+    //reloadMessages();
 }
 
 /**
@@ -282,6 +281,7 @@ let getYourPic = () => {
  * It clears the message list and then reloads it with the messages from the selected contact.
  */
 let reloadMessages = () => {
+    console.log("reloadMessages");
     document.getElementById("messageList").innerHTML = "";
     getMessages(getSelectedContactName());
 }
@@ -310,11 +310,11 @@ let logout = () => {
  * and change the background color of the element with the id "deleteMsg" to red.
  */
 let deleteMsg = () => {
-    if(cancelMsg){
+    if (cancelMsg) {
         cancelMsg = false;
         document.getElementById("deleteMsg").style.backgroundColor = "#011936";
     }
-    else{
+    else {
         cancelMsg = true;
         document.getElementById("deleteMsg").style.backgroundColor = "red";
     }
@@ -326,11 +326,11 @@ let deleteMsg = () => {
  * background color of the button to red.
  */
 let deteleContact = () => {
-    if(cancelContact){
+    if (cancelContact) {
         cancelContact = false;
         document.getElementById("deleteContact").style.backgroundColor = "#011936";
     }
-    else{
+    else {
         cancelContact = true;
         document.getElementById("deleteContact").style.backgroundColor = "red";
     }
@@ -348,15 +348,18 @@ socket.addEventListener('message', (event) => {
     data = JSON.parse(event.data).data;
     date = JSON.parse(event.data).date;
 
-    switch(operation){
+    switch (operation) {
         case "message":
-            if(receiver == "server"){
+            if (receiver == "server") {
                 alert("Message from server: " + data);
 
-            }else{
+            } else {
                 //if the message isn't from the current user and the current user is neither the sender nor the receiver
-                if(username != getStoredValue("username") && getSelectedContactName() != username && getSelectedContactName() != receiver)
-                     return;
+                if (username != getStoredValue("username") && getSelectedContactName() != username && getSelectedContactName() != receiver)
+                    return;
+                //check if message already exists
+                messageList = document.getElementById("messageList");
+                messageList.scrollTop = messageList.scrollHeight;
                 getContactPic();
                 getYourPic();
                 var message = document.createElement('div');
@@ -365,14 +368,14 @@ socket.addEventListener('message', (event) => {
                 var messageSender = document.createElement('p');
                 var messageText = document.createElement('p');
                 var messageDate = document.createElement('p');
-                if(username == getStoredValue("username")){
+                if (username == getStoredValue("username")) {
                     message.className = "message-container sent";
                     senderImage.className = "message-sender-image";
                     messageSender.className = "message-sender";
                     messageText.className = "message-text-sent";
                     messageDate.className = "message-date-sent";
                     messageDiv.className = "message-div-sent";
-                }else{
+                } else {
                     message.className = "message-container received";
                     senderImage.className = "message-receiver-image";
                     messageSender.className = "message-receiver";
@@ -391,17 +394,17 @@ socket.addEventListener('message', (event) => {
                 var minutes = date.getMinutes();
                 messageDate.innerHTML = hours + ":" + minutes;
                 message.appendChild(messageDate);
-                
 
-                message.onclick = function() {
-                    if(cancelMsg){
+
+                message.onclick = function () {
+                    if (cancelMsg) {
                         let message1 = {
                             "operation": "removeMessage",
                             "username": getStoredValue("username"),
                             "receiver": getSelectedContactName(),
                             "data": message.date,
                             "date": new Date().toISOString()
-                            
+
                         }
                         sendToServer(JSON.stringify(message1));
                         reloadMessages();
@@ -419,24 +422,24 @@ socket.addEventListener('message', (event) => {
         case "image":
             var imagediv = document.createElement('div');
             var image = document.createElement('img');
-            if(username == getStoredValue("username")){
+            if (username == getStoredValue("username")) {
                 imagediv.className = "image-sent";
-            }else{
+            } else {
                 imagediv.className = "image-received";
             }
-            image.src =  data;
+            image.src = data;
             image.width = 200;
             image.height = 200;
             image.date = date;
-            image.onclick = function() {
-                if(cancelMsg){
+            image.onclick = function () {
+                if (cancelMsg) {
                     let message1 = {
                         "operation": "removeMessage",
                         "username": getStoredValue("username"),
                         "receiver": getSelectedContactName(),
                         "data": image.date,
                         "date": new Date().toISOString()
-                        
+
                     }
                     sendToServer(JSON.stringify(message1));
                     reloadMessages();
@@ -448,7 +451,7 @@ socket.addEventListener('message', (event) => {
             document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
             break;
         case "getProfilePic":
-            if(username == getStoredValue("username")){
+            if (username == getStoredValue("username")) {
                 console.log("profile pic: " + data);
                 storeValue("profilePic", data);
                 for (let i = 0; i < document.getElementsByClassName("message-sender-image").length; i++) {
@@ -473,37 +476,38 @@ socket.addEventListener('message', (event) => {
             contact.appendChild(image);
             contact.appendChild(name);
             name.innerText = username;
-            image.src =  data;
+            image.src = data;
 
 
-            
-            contact.className = "contact-name";
-            contact.onclick = function() {
-            document.getElementById("messageList").innerText = "";
-            let contactList = document.getElementById("contactList").children;
-            for (let i = 0; i < contactList.length; i++) {
-                contactList[i].id = "";
-                contactList[i].style.backgroundColor = "white";
-                contactList[i].style.color = "black";
-            }
-            contact.id = "active";
-            contact.style.backgroundColor = "#011936";
-            contact.style.color = "white";
-            contact.style.borderRadius = "5px";
 
-            getMessages(getSelectedContactName());
-            if(cancelContact){
-                let message = {
-                    "operation": "removeContact",
-                    "username": getStoredValue("username"),
-                    "receiver": "server",
-                    "data": getSelectedContactName(),
-                    "date": new Date().toISOString()
+            contact.onclick = function () {
+                document.getElementById("messageList").innerText = "";
+                let contactList = document.getElementById("contactList").children;
+                for (let i = 0; i < contactList.length; i++) {
+                     contactList[i].id = "";
+                //     contactList[i].style.backgroundColor = "#1a445c85";
+                //     contactList[i].style.color = "white";
+                 }
+                contact.id = "active";
+                // contact.style.backgroundColor = "#011936";
+                // contact.style.color = "white";
+                // contact.style.borderRadius = "5px";
+
+                getMessages(getSelectedContactName());
+                if (cancelContact) {
+                    let message = {
+                        "operation": "removeContact",
+                        "username": getStoredValue("username"),
+                        "receiver": "server",
+                        "data": getSelectedContactName(),
+                        "date": new Date().toISOString()
                     }
-                sendToServer(JSON.stringify(message));
-                reloadContacts();
-                return;
+                    sendToServer(JSON.stringify(message));
+                    reloadContacts();
+                    return;
                 }
+                messageList  = document.getElementById("messageList");
+                messageList.scrollTop = messageList.scrollHeight;
                 getContactPic();
                 getContactBio();
                 message = {
@@ -518,21 +522,21 @@ socket.addEventListener('message', (event) => {
             document.getElementById("contactList").appendChild(contact);
             break;
         case "checkLoginID":
-            if(data == "true"){
-                if(!window.location.pathname == '/Client/index.html')
+            if (data == "true") {
+                if (!window.location.pathname == '/Client/index.html')
                     window.location.pathname = 'Client/chat.html';
-            }else{
+            } else {
                 window.location.pathname = 'Client/index.html';
             }
         case "draft":
-            if(draft == null)
+            if (draft == null)
                 return;
-            if(receiver == getSelectedContactName()){
+            if (receiver == getSelectedContactName()) {
                 document.getElementById("message-input").value = data;
             }
             break;
         case "profilePic":
-            if(username === getStoredValue("username")){
+            if (username === getStoredValue("username")) {
                 console.log("profile pic: " + data);
                 storeValue("profilePic", data);
                 for (let i = 0; i < document.getElementsByClassName("message-sender-image").length; i++) {

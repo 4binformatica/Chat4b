@@ -11,7 +11,7 @@
 
 body {
     background: var(--prussian-blue-2);
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 h4.small-title {
@@ -158,22 +158,3 @@ button.editPass, button.savePass {
     left: 10px;
 }
 
-.lFont {
-    position: relative;
-    font-family: var(--font);
-    font-weight: bold;
-    font-size: 25px;
-    top: 5px;
-}
-
-.containerSmallAppearence {
-    display: flex;
-    width: 60%;
-    height: 450px;
-    border: 10px solid var(--prussian-blue);
-    background-color: var(--indigo-dye);
-    color: #fff;
-    border-radius: 20px;
-    padding: 20px;
-    display: flex;
-}

@@ -1,5 +1,11 @@
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.html -f
-RewriteRule ^(.*)$ $1.html [NC,L] 
+#<IfModule mod_rewrite.c>
+    #RewriteEngine On
+    #RewriteBase /
+    #RewriteRule ^.*$ /index.html [L]
+   # RewriteRule ^login$ /login.html [L] 
+  #  RewriteRule ^chat$ /chat.html [L] 
+ #   RewriteRule ^profile$ /profile.html [L]
+#</IfModule>
+
 
 ErrorDocument 404 /404-error.html

@@ -1,7 +1,21 @@
+var debug = true;
 
+$(document).ready(function(){
+    checkConnection();
+});
 
 let sendToServer = (message) => {
     socket.send(message);
+}
+
+let checkConnection = () => {
+    if(socket.readyState === 1){
+        return true;
+    }
+    else{
+        console.log("Connection to server failed");
+        return false;
+    }
 }
 
 let writingEffect = async (str, element, startTime, cancelTime) => {
@@ -66,3 +80,15 @@ async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function scrollToElement(element) {
+    console.log("moving to " + element);
+    var $target = $(element);
+    if ($target.length) {
+      var top = $target.offset().top;
+      $('html, body').animate({scrollTop: top}, 1000);
+    }
+  }
+  
+  
+  
+  

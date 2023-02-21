@@ -192,6 +192,11 @@ public class Server extends WebSocketServer {
      */
     public void sendTo(Message message) throws SQLException {
         System.out.println(clients.get(message.getReceiver()) + " " + message.getReceiver());
+        //check if receiver is online
+        if(clients.get(message.getReceiver()) == null){
+
+            return;
+        }
         for(WebSocket conn : clients.get(message.getReceiver())){
             if (conn != null) {
                 System.out.println("Sending message to " + message.getReceiver() + " from " + message.getUsername());
@@ -445,9 +450,12 @@ public class Server extends WebSocketServer {
                 if(!database.validateLoginID(msg.getUsername())){
                     return;
                 }
+                System.out.println("Message received from " + msg.getUsername() + " to " + msg.getReceiver() + " " + msg.getMessage());
                 msg.setUserName(database.getUsernameByLoginID(msg.getUsername()));
                 database.addMessage(msg);
+
                 sendTo(msg);
+                sendTo(msg.getUsername(), msg);
                 break;
             // Removing a message from the database.
             case "removeMessage":
@@ -547,7 +555,11 @@ public class Server extends WebSocketServer {
                 break;
             // Creating a draft for the user.
             case "saveDraft":
-                database.createDraft(msg.getUsername(), msg.getData(), msg.getReceiver());
+                if(!database.validateLoginID(msg.getUsername())){
+                    return;
+                }
+
+                database.createDraft(database.getUsernameByLoginID(msg.getUsername()), msg.getData(), msg.getReceiver());
                 break;
             // The above code is getting the bio of the user.
             case "getBio":
