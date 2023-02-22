@@ -1,42 +1,46 @@
-package com.chat4b;
+package com.chat4b.Message;
 
 import java.time.Instant;
 
 import org.java_websocket.WebSocket;
 
 import com.google.gson.Gson;
-
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 /**
  * Message
  */
 
-
 public class Message {
     private String message;
 
+    @Expose
     private String operation;
+    @Expose
     private String username;
+    @Expose
     private String receiver;
+    @Expose
     private String data;
+    @Expose
     private String date;
-    private String clientInfo;
+
+    private ClientInfo clientInfo = new ClientInfo();
     private WebSocket conn;
 
-
-
-    Message(String message) {
+    public Message(String message) {
         this.message = message;
         decode();
     }
 
-    Message(String message, WebSocket conn2){
+    public Message(String message, WebSocket conn2) {
         this.message = message;
         this.conn = conn2;
         decode();
     }
 
-    Message(String operation, String username, String receiver, String data, String date) {
+    public Message(String operation, String username, String receiver, String data, String date) {
         this.operation = operation;
         this.username = username;
         this.receiver = receiver;
@@ -44,14 +48,13 @@ public class Message {
         this.date = date;
     }
 
-    Message(String operation, String username, String receiver, String data) {
+    public Message(String operation, String username, String receiver, String data) {
         this.operation = operation;
         this.username = username;
         this.receiver = receiver;
         this.data = data;
         this.date = Instant.now().toString();
     }
-    
 
     public void decode() {
         Gson gson = new Gson();
@@ -91,12 +94,22 @@ public class Message {
         return conn;
     }
 
-    public String toJson(){
-        return "{\"operation\":\"" + operation + "\",\"username\":\"" + username  + "\",\"receiver\":\"" + receiver + "\",\"data\":\"" + data + "\",\"date\":\"" + date + "\"}";
+    public String toJson() {
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(this);
+    }
+
+    public static String toJson(Message m) {
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(m);
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return getMessage();
     }
 
@@ -108,9 +121,23 @@ public class Message {
         this.username = name;
     }
 
+    public void setData(String data) {
+        this.data = data;
+    }
 
-        
-    
+    public MessageData getMessageData(){
+        if(!operation.equals("message")) return null;
+        Gson gson = new GsonBuilder()
+        .excludeFieldsWithoutExposeAnnotation()
+        .create();
+        return gson.fromJson(data, MessageData.class);
+    }
 
+    public void setMessageData(MessageData dat) {
+        Gson gson = new GsonBuilder()
+        .excludeFieldsWithoutExposeAnnotation()
+        .create();
+        this.data = gson.toJson(dat);
+    }
 
 }

@@ -306,6 +306,11 @@ div.small-title {
     margin: 0;
   }
 
+  .message-text-received a, .message-text-sent a {
+    color: #fff;
+  }
+
+
   .message-date-sent {
     float: right;
   }
@@ -381,10 +386,6 @@ div.small-title {
     top: 15px;
   }
   
-  
-
-  
-
   div.image-sent {
     text-align: right;
   }

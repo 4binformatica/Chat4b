@@ -13,6 +13,9 @@ import java.sql.Statement;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+
+import com.chat4b.Message.Message;
+
 public class Database {
 
     String url = "jdbc:sqlite:database.db";

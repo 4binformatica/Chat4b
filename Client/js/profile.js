@@ -110,10 +110,11 @@ let getProfilePic = function() {
  * GetBio() is a function that sends a message to the server to get the bio of the user.
  */
 let getBio = function() {
+    console.log("getBio" + getStoredValue("loginID"));
     message = {
         "operation": "getBio",
         "username": getStoredValue("username"),
-        "recevier": getStoredValue("loginID"),
+        "receiver": getStoredValue("loginID"),
         "data": getStoredValue("username"),
         "date": new Date().getTime()
 
@@ -126,7 +127,7 @@ let editBio = function() {
     let message = {
         "operation": "changeBio",
         "username": getStoredValue("username"),
-        "receiver": getStoredValue("username"),
+        "receiver": getStoredValue("loginID"),
         "data": bio,
         "date": new Date().getTime()
 

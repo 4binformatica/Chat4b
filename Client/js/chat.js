@@ -189,10 +189,13 @@ let sendImage = async () => {
         // convertire l'immagine in una stringa base64
         let base64Img = reader.result.split(',')[1];
         let messageObject = {
-            "operation": "image",
+            "operation": "message",
             "username": getStoredValue("loginID"),
             "receiver": getSelectedContactName(),
-            "data": base64Img,
+            "data": JSON.stringify({
+                "text": "",
+                "image": base64Img
+            }),
             "date": new Date().toISOString()
         };
         sendToServer(JSON.stringify(messageObject));
@@ -223,11 +226,21 @@ let sendMessage = async () => {
     sendToServer(JSON.stringify(messageDraft));
     document.getElementById("message-input").value = ""
     document.getElementById("messageList").scrollTop = document.getElementById("messageList").scrollHeight;
+    //in front of every " add \ to escape it
+    for (let i = 0; i < message.length; i++) {
+        if (message.charAt(i) == '"') {
+            message = message.substring(0, i) + '\\' + message.substring(i);
+            i++;
+        }
+    }
     let messageObject = {
         "operation": "message",
         "username": getStoredValue("loginID"),
         "receiver": receiver,
-        "data": message,
+        "data": JSON.stringify({
+            "text": message,
+            "image": ""
+        }),
         "date": new Date().toISOString()
     }
 
@@ -366,13 +379,17 @@ socket.addEventListener('message', (event) => {
                 var messageDiv = document.createElement('div');
                 var senderImage = document.createElement('img');
                 var messageSender = document.createElement('p');
-                var messageText = document.createElement('p');
+                var messageData = JSON.parse(data);
                 var messageDate = document.createElement('p');
+                var messageImage = document.createElement('img');
+                var messageText = document.createElement('p');
+
                 if (username == getStoredValue("username")) {
                     message.className = "message-container sent";
                     senderImage.className = "message-sender-image";
                     messageSender.className = "message-sender";
                     messageText.className = "message-text-sent";
+                    messageImage.className = "message-image-sent";
                     messageDate.className = "message-date-sent";
                     messageDiv.className = "message-div-sent";
                 } else {
@@ -380,15 +397,38 @@ socket.addEventListener('message', (event) => {
                     senderImage.className = "message-receiver-image";
                     messageSender.className = "message-receiver";
                     messageText.className = "message-text-received";
+                    messageImage.className = "message-image-received";
                     messageDate.className = "message-date-received";
                     messageDiv.className = "message-div-received";
                 }
-                messageDiv.appendChild(messageText);
+                //remove " at the beginning and end of the data
+                
+                if (messageData.image != null && messageData.image != "") {
+                    
+                    messageImage.src = messageData.image;
+                    messageDiv.appendChild(messageImage);
+                }
+                if (messageData.text != null && messageData.text != "") {
+                   
+                    /*if (messageData.text.contains("https://www.youtube.com/watch?v=")) {
+                        var video = document.createElement('iframe');
+                        video.src = messageData.text;
+                        messageDiv.appendChild(video);
+                    }*/
+                    if (messageData.text.includes("http")) {
+                        messageText.innerHTML = "<a href='" + messageData.text + "'>" + messageData.text + "</a>";
+                    }
+                    else
+                        messageText.innerText = messageData.text;
+                    messageDiv.appendChild(messageText);
+                }
+
+
+
                 message.appendChild(senderImage);
                 messageSender.innerHTML = username;
                 message.appendChild(messageSender);
                 message.appendChild(messageDiv);
-                messageText.innerHTML = data;
                 var date = new Date(date);
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
@@ -484,10 +524,10 @@ socket.addEventListener('message', (event) => {
                 document.getElementById("messageList").innerText = "";
                 let contactList = document.getElementById("contactList").children;
                 for (let i = 0; i < contactList.length; i++) {
-                     contactList[i].id = "";
-                //     contactList[i].style.backgroundColor = "#1a445c85";
-                //     contactList[i].style.color = "white";
-                 }
+                    contactList[i].id = "";
+                    //     contactList[i].style.backgroundColor = "#1a445c85";
+                    //     contactList[i].style.color = "white";
+                }
                 contact.id = "active";
                 // contact.style.backgroundColor = "#011936";
                 // contact.style.color = "white";
@@ -506,7 +546,7 @@ socket.addEventListener('message', (event) => {
                     reloadContacts();
                     return;
                 }
-                messageList  = document.getElementById("messageList");
+                messageList = document.getElementById("messageList");
                 messageList.scrollTop = messageList.scrollHeight;
                 getContactPic();
                 getContactBio();
